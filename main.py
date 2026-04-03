@@ -1,8 +1,10 @@
-import customtkinter as ctk # pip install customtkinter
+import customtkinter as ctk
 
 
 class App:
     def __init__(self):
+        self.image_data_source = {}
+
         ctk.set_appearance_mode('dark')
         ctk.set_default_color_theme('dark-blue')
 
@@ -29,34 +31,6 @@ class App:
         self.loadImageBtn = ctk.CTkButton(self.main_frame, text='Load Images', font=('Berlin Sans FB Demi', 32))
         self.loadImageBtn.grid(row=0, columnspan=3, sticky='we', padx=600)
 
-        # # ________________________ Pallet Side ________________________
-        # self.palletFrame = ctk.CTkFrame(self.main_frame)
-        # self.palletFrame.grid(row=1, column=0, sticky='nswe', padx=2)
-        # self.palletFrame.columnconfigure(0, weight=1)
-        # self.palletFrame.rowconfigure(0, weight=1)
-        #
-        # self. titleLab = ctk.CTkLabel(self.palletFrame, text='Image List',
-        #              font=('Berlin Sans FB Demi', 32),
-        #              height=100
-        #              )
-        # self. titleLab.grid(row=0, column=0, sticky='we')
-        # self.titleLab.grid_propagate(False)
-        #
-        #
-        # # ScrollPane for images
-        # self.scrollPane = ctk.CTkScrollableFrame(self.palletFrame, height=635)
-        # self.scrollPane.grid(row=1, column=0, sticky='nswe')
-        # self.scrollPane.rowconfigure(0, weight=1)
-        # for x in range(30):
-        #     ctk.CTkLabel(self.scrollPane, text=f'➡Image {x}',
-        #                  font=('Berlin Sans FB Demi', 24)
-        #                  ).pack(padx= 5, pady=1,  anchor='w')
-        #
-        # # Folder Details
-        # self.palletFolderDetails = ctk.CTkFrame(self.palletFrame)
-        # self.palletFolderDetails.grid(row=2,column=0, sticky='nswe', pady=2)
-        # self. lab = ctk.CTkLabel(self.palletFolderDetails, text='Site Details', font=('Berlin Sans FB Demi', 24))
-        # self.lab.grid(row=0, column=0)
 
         # ________________________ Pallet Side ________________________
 
@@ -115,6 +89,8 @@ class App:
         # Right
         self.right_frame = ctk.CTkFrame(self.main_frame)
         self.right_frame.grid(row=1, column=2, sticky='nswe', padx = 2)
+
+
 
     def run(self):
         self.root.mainloop()
