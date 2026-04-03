@@ -3,6 +3,7 @@ from utils.FileProcessor import FileProcessor as fp
 import tkinter.font as tkfont
 from PIL import Image
 import os
+from utils.CarouselWidgets import CarouselWidgets
 
 
 class App:
@@ -27,7 +28,7 @@ class App:
 
         # Column Configuration
         self.main_frame.columnconfigure(0, weight=1)
-        self.main_frame.columnconfigure(1, weight=4)
+        self.main_frame.columnconfigure(1, weight=0)
         self.main_frame.columnconfigure(2, weight=5)
         self.main_frame.rowconfigure(0, weight=0)
         self.main_frame.rowconfigure(1, weight=1)
@@ -43,10 +44,12 @@ class App:
                                           text='Load Images',
                                           image=self.icon_load,
                                           compound='right',
-                                          font=('Berlin Sans FB Demi', 32),
+                                          font=('Berlin Sans FB Demi', 26),
                                           command=self.loadImageList
                                           )
-        self.loadImageBtn.grid(row=0, columnspan=3, sticky='we', padx=600)
+        self.loadImageBtn.grid(row=0, columnspan=3, sticky='we', pady=10, padx=600)
+
+
 
 
         # ________________________ Pallet Side ________________________
@@ -126,7 +129,11 @@ class App:
 
         # Center
         self.center_frame = ctk.CTkFrame(self.main_frame)
-        self.center_frame.grid(row=1, column=1, sticky='nswe')
+        self.center_frame.grid(row=1, column=1, sticky='ns')
+        # self.center_frame.pack()
+
+        #  Cria Carousel
+        self.loadCarousel()
 
         # Right
         self.right_frame = ctk.CTkFrame(self.main_frame)
@@ -193,6 +200,9 @@ class App:
         loader.destroy()
         progress.destroy()
 
+        self.loadCarousel()
+
+
     def ellipsis_path(self, widget, text, max_width):
         font = tkfont.Font(font=widget.cget("font"))
 
@@ -218,8 +228,6 @@ class App:
 
         return "..."
 
-
-
     def on_click(self, event, widget, data):
 
         # reset item anterior
@@ -233,6 +241,34 @@ class App:
 
         print(f"Selecionaste: {data.get('file')}")
 
+    def loadCarousel(self):
+        paths = ['assets/logo2.png']
+        if len(self.dataSource) > 0:
+            paths = []
+
+        for item in self.dataSource.values():
+
+            path = item.get('absolutePath')
+
+            if path and os.path.isfile(path):
+                paths.append(path)
+
+        # ⭐ CALLBACK REGISTADO
+        self.carousel = CarouselWidgets(
+            on_change=self.update_image_details)
+
+        self.carousel.createCarousel(
+            self.center_frame,
+            paths
+        )
+
+    def update_image_details(self, details=None):
+
+        print("NOVOS DETALHES RECEBIDOS:")
+        print(details)
+        print(details['locationDetails']['latitude'])
+        print(details['locationDetails']['longitude'])
+        print(details['locationDetails']['altitude'])
 
 
 
