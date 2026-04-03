@@ -2,6 +2,7 @@ import customtkinter as ctk
 from utils.FileProcessor import FileProcessor as fp
 import tkinter.font as tkfont
 from PIL import Image
+import os
 
 
 class App:
@@ -131,42 +132,66 @@ class App:
         self.right_frame = ctk.CTkFrame(self.main_frame)
         self.right_frame.grid(row=1, column=2, sticky='nswe', padx = 2)
 
-
     def loadImageList(self):
         fp_instance = fp()
-        self.dataSource = fp_instance.load()
+        path = fp_instance.getPath()  # Pergunta a pasta primeiro
+        if not path:
+            return
 
-        if self.dataSource:
-            for widget in self.scrollPane.winfo_children():
+        # Mostrar loader
+        loader = ctk.CTkLabel(self.scrollPane, text="Loading...", font=('Berlin Sans FB Demi', 20))
+        loader.pack(pady=20)
+
+        progress = ctk.CTkProgressBar(self.scrollPane, width=200)
+        progress.pack(pady=10)
+        progress.set(0)
+
+        self.root.update()  # Forçar redraw para mostrar o loader antes de processar
+
+        # Limpar dados antigos
+        self.dataSource = {}
+        for widget in self.scrollPane.winfo_children():
+            if widget not in (loader, progress):
                 widget.destroy()
 
-            for item in self.dataSource.values():
-                if item.get('file') is not None:
-                    lab = ctk.CTkLabel(
-                        self.scrollPane,
-                        text=f"➡ {item.get('file')}",
-                        font=('Comic Sans MS', 16),
-                        anchor='w'
-                    )
+        valid_extensions = ('.jpg', '.jpeg', '.png')
+        self.dataSource[0] = {'srcPath': path}
 
-                    lab.pack(fill='x', padx=8, pady=2)
+        files = [f for f in os.listdir(path) if f.lower().endswith(valid_extensions)]
+        total_files = len(files)
 
-                    # bind click
-                    lab.bind(
-                        "<Button-1>",
-                        lambda e, widget=lab, data=item: self.on_click(e, widget, data)
-                    )
+        # Carregar cada arquivo com update do progress
+        for idx, file in enumerate(files, start=1):
+            full_path = os.path.join(path, file)
+            self.dataSource[idx] = {'absolutePath': full_path, 'file': file}
 
-            if self.dataSource:
-                max_width = 240  # largura disponível
-                path = self.dataSource[0].get("srcPath")
-                text = self.ellipsis_path(self.lab2, path, max_width)
+            lab = ctk.CTkLabel(
+                self.scrollPane,
+                text=f"➡ {file}",
+                font=('Comic Sans MS', 16),
+                anchor='w'
+            )
+            lab.pack(fill='x', padx=8, pady=2)
 
-                self.lab2.configure(text=f"Src: {text}")
-                self.lab3.configure(text=f'File Counter:  {len(self.dataSource)-1}')
-                self.lab4.configure(text=f'Folder Size: {((fp_instance.get_folder_size(path)/1024)/1024):.2f}MB')
-                self.lab5.configure(text=f'Created At: {fp_instance.get_creation_date(path)}')
+            lab.bind(
+                "<Button-1>",
+                lambda e, widget=lab, data=self.dataSource[idx]: self.on_click(e, widget, data)
+            )
 
+            progress.set(idx / total_files)  # Atualiza barra de progresso
+            self.root.update()  # Redesenha a interface
+
+        # Atualizar detalhes da pasta
+        max_width = 240
+        text = self.ellipsis_path(self.lab2, path, max_width)
+        self.lab2.configure(text=f"Src: {text}")
+        self.lab3.configure(text=f'File Counter: {total_files}')
+        self.lab4.configure(text=f'Folder Size: {((fp_instance.get_folder_size(path) / 1024) / 1024):.2f}MB')
+        self.lab5.configure(text=f'Created At: {fp_instance.get_creation_date(path)}')
+
+        # Remover loader
+        loader.destroy()
+        progress.destroy()
 
     def ellipsis_path(self, widget, text, max_width):
         font = tkfont.Font(font=widget.cget("font"))
