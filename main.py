@@ -1,9 +1,9 @@
 import customtkinter as ctk
-
+from utils.FileProcessor import FileProcessor as fp
 
 class App:
     def __init__(self):
-        self.image_data_source = {}
+        self.dataSource = {}
 
         ctk.set_appearance_mode('dark')
         ctk.set_default_color_theme('dark-blue')
@@ -28,7 +28,11 @@ class App:
         self.main_frame.rowconfigure(1, weight=1)
 
         # Load Images Button
-        self.loadImageBtn = ctk.CTkButton(self.main_frame, text='Load Images', font=('Berlin Sans FB Demi', 32))
+        self.loadImageBtn = ctk.CTkButton(self.main_frame,
+                                          text='Load Images',
+                                          font=('Berlin Sans FB Demi', 32),
+                                          command=self.loadImageList
+                                          )
         self.loadImageBtn.grid(row=0, columnspan=3, sticky='we', padx=600)
 
 
@@ -58,25 +62,49 @@ class App:
         self.scrollPane = ctk.CTkScrollableFrame(self.palletFrame)
         self.scrollPane.grid(row=1, column=0, sticky='nswe', padx=5, pady=1)
 
-        for x in range(30):
-            ctk.CTkLabel(
-                self.scrollPane,
-                text=f'➡ Image {x}',
-                font=('Berlin Sans FB Demi', 24),
-                anchor='w'
-            ).pack(fill='x', padx=8, pady=2)
-
         # ---------- Folder Details ----------
         self.palletFolderDetails = ctk.CTkFrame(self.palletFrame)
         self.palletFolderDetails.grid(row=2, column=0, sticky='we', padx=5, pady=5)
 
+
         self.lab = ctk.CTkLabel(
             self.palletFolderDetails,
-            height=200,
             text='Site Details',
             font=('Berlin Sans FB Demi', 24)
         )
-        self.lab.pack(anchor='e')
+        self.lab.pack(anchor='w', fill='x')
+
+        self.lab2 = ctk.CTkLabel(
+            self.palletFolderDetails,
+            text='Src:',
+            font=('Comic Sans MS', 12),
+            anchor='w'
+        )
+        self.lab2.pack(anchor='w', fill='x')
+
+        self.lab3 = ctk.CTkLabel(
+            self.palletFolderDetails,
+            text='File Counter:',
+            font=('Comic Sans MS', 12),
+            anchor='w'
+        )
+        self.lab3.pack(anchor='w', fill='x')
+
+        self.lab4 = ctk.CTkLabel(
+            self.palletFolderDetails,
+            text='Folder Size:',
+            font=('Comic Sans MS', 12),
+            anchor='w'
+        )
+        self.lab4.pack(anchor='w', fill='x')
+
+        self.lab5 = ctk.CTkLabel(
+            self.palletFolderDetails,
+            text='Created At:',
+            font=('Comic Sans MS', 12),
+            anchor='w'
+        )
+        self.lab5.pack(anchor='w', fill='x')
 
 
 
@@ -89,6 +117,32 @@ class App:
         # Right
         self.right_frame = ctk.CTkFrame(self.main_frame)
         self.right_frame.grid(row=1, column=2, sticky='nswe', padx = 2)
+
+
+    def loadImageList(self):
+        self.dataSource = fp().load()
+
+        if self.dataSource:
+            for widget in self.scrollPane.winfo_children():
+                widget.destroy()
+
+            for item in self.dataSource.values():
+                if item.get('file') is not None:
+                    ctk.CTkLabel(
+                        self.scrollPane,
+                        text=f'➡{item.get('file')}',
+                        font=('Comic Sans MS', 16),
+                        anchor='w'
+                    ).pack(fill='x', padx=8, pady=2)
+
+            if self.dataSource:
+                self.lab2.configure(text=f'Src: {self.dataSource[0].get('srcPath')}')
+                self.lab3.configure(text=f'File Counter:  {len(self.dataSource)-1}')
+                self.lab4.configure(text='Folder Size:')
+                self.lab5.configure(text='Created At:')
+
+
+
 
 
 
