@@ -1,9 +1,13 @@
 import customtkinter as ctk
 from utils.FileProcessor import FileProcessor as fp
+import tkinter.font as tkfont
+from PIL import Image
+
 
 class App:
     def __init__(self):
         self.dataSource = {}
+        self.selected_item = None
 
         ctk.set_appearance_mode('dark')
         ctk.set_default_color_theme('dark-blue')
@@ -28,8 +32,16 @@ class App:
         self.main_frame.rowconfigure(1, weight=1)
 
         # Load Images Button
+        # Icon para o botao
+        self.icon_load = ctk.CTkImage(
+            light_image=Image.open("assets/ico.png"),
+            dark_image=Image.open("assets/ico2.png"),
+            size=(64, 64)  # tamanho do ícone
+        )
         self.loadImageBtn = ctk.CTkButton(self.main_frame,
                                           text='Load Images',
+                                          image=self.icon_load,
+                                          compound='right',
                                           font=('Berlin Sans FB Demi', 32),
                                           command=self.loadImageList
                                           )
@@ -78,6 +90,7 @@ class App:
             self.palletFolderDetails,
             text='Src:',
             font=('Comic Sans MS', 12),
+            # wraplength=210, # px
             anchor='w'
         )
         self.lab2.pack(anchor='w', fill='x')
@@ -120,7 +133,8 @@ class App:
 
 
     def loadImageList(self):
-        self.dataSource = fp().load()
+        fp_instance = fp()
+        self.dataSource = fp_instance.load()
 
         if self.dataSource:
             for widget in self.scrollPane.winfo_children():
@@ -128,19 +142,71 @@ class App:
 
             for item in self.dataSource.values():
                 if item.get('file') is not None:
-                    ctk.CTkLabel(
+                    lab = ctk.CTkLabel(
                         self.scrollPane,
-                        text=f'➡{item.get('file')}',
+                        text=f"➡ {item.get('file')}",
                         font=('Comic Sans MS', 16),
                         anchor='w'
-                    ).pack(fill='x', padx=8, pady=2)
+                    )
+
+                    lab.pack(fill='x', padx=8, pady=2)
+
+                    # bind click
+                    lab.bind(
+                        "<Button-1>",
+                        lambda e, widget=lab, data=item: self.on_click(e, widget, data)
+                    )
 
             if self.dataSource:
-                self.lab2.configure(text=f'Src: {self.dataSource[0].get('srcPath')}')
-                self.lab3.configure(text=f'File Counter:  {len(self.dataSource)-1}')
-                self.lab4.configure(text='Folder Size:')
-                self.lab5.configure(text='Created At:')
+                max_width = 240  # largura disponível
+                path = self.dataSource[0].get("srcPath")
+                text = self.ellipsis_path(self.lab2, path, max_width)
 
+                self.lab2.configure(text=f"Src: {text}")
+                self.lab3.configure(text=f'File Counter:  {len(self.dataSource)-1}')
+                self.lab4.configure(text=f'Folder Size: {((fp_instance.get_folder_size(path)/1024)/1024):.2f}MB')
+                self.lab5.configure(text=f'Created At: {fp_instance.get_creation_date(path)}')
+
+
+    def ellipsis_path(self, widget, text, max_width):
+        font = tkfont.Font(font=widget.cget("font"))
+
+        # se couber, retorna normal
+        if font.measure(text) <= max_width:
+            return text
+
+        left = 0
+        right = len(text)
+
+        while left < right:
+            left_part = text[:left]
+            right_part = text[len(text) - right:]
+            candidate = f"{left_part}...{right_part}"
+
+            if font.measure(candidate) <= max_width:
+                return candidate
+
+            if left <= right:
+                right -= 1
+            else:
+                left += 1
+
+        return "..."
+
+
+
+    def on_click(self, event, widget, data):
+
+        # reset item anterior
+        if self.selected_item and self.selected_item.winfo_exists():
+            self.selected_item.configure(fg_color="transparent")
+
+        # destacar novo
+        widget.configure(fg_color="#1f6aa5")
+
+        self.selected_item = widget
+
+        print(f"Selecionaste: {data.get('file')}")
 
 
 
