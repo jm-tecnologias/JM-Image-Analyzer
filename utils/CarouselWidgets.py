@@ -42,7 +42,7 @@ class CarouselWidgets:
 
         # Label principal (imagem)
         self.label = ctk.CTkLabel(frame, text="", width=850, height=550)
-        self.label.grid(row=0, column=0, pady=10, padx=10)
+        self.label.grid(row=1, column=0, pady=10, padx=10)
 
         # Mostrar primeira imagem
         self.update_image()
