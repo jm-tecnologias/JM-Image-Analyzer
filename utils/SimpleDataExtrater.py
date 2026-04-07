@@ -10,9 +10,6 @@ class SimpleDataExtrater:
         if exifData:
             for tag_id, value in exifData.items():
                 tag = TAGS.get(tag_id, tag_id)
-                # metaDataSouce = {
-                #     tag: value
-                # }
 
                 metaDataSouce[tag] = value
 

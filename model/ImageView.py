@@ -63,3 +63,57 @@ class ImageView:
         )
 
         self.image_label.configure(image=self.my_image)
+
+# class ImageView:
+#     def __init__(self, master):
+#         self.master = master
+#         self.master.pack_propagate(False)
+#
+#         # ------------------- Frame principal -------------------
+#         self.imageFrame = ctk.CTkFrame(master)
+#         self.imageFrame.grid(row=0, column=0, sticky='nswe', padx=10, pady=10)
+#         self.imageFrame.columnconfigure(0, weight=1)
+#         self.imageFrame.rowconfigure(1, weight=1)
+#
+#         # ------------------- Título -------------------
+#         self.titleLabel = ctk.CTkLabel(
+#             self.imageFrame,
+#             text="Image Preview",
+#             font=("Berlin Sans FB Demi", 32)
+#         )
+#         self.titleLabel.grid(row=0, column=0, sticky='we', pady=(20, 10))
+#
+#         # ------------------- Label da imagem -------------------
+#         self.image_label = ctk.CTkLabel(self.imageFrame, text="")
+#         self.image_label.grid(row=1, column=0, sticky='nswe', pady=10)
+#
+#         # ------------------- Estado interno -------------------
+#         self.current_pil = None
+#         self.setImage("assets/logo.png")
+#
+#     # ------------------- SET IMAGE -------------------
+#     def setImage(self, path):
+#         new_image = Image.open(path).convert("RGBA").resize((850, 550))
+#
+#         if self.current_pil is None:
+#             self.current_pil = new_image
+#             self._update_label(new_image)
+#             return
+#
+#         old_image = self.current_pil.convert("RGBA")
+#         self._fade_transition(old_image, new_image)
+#
+#     # ------------------- FADE TRANSITION -------------------
+#     def _fade_transition(self, old_img, new_img, step=0):
+#         alpha = step / 10
+#         blended = Image.blend(old_img, new_img, alpha)
+#         self._update_label(blended)
+#         if step < 10:
+#             self.master.after(30, lambda: self._fade_transition(old_img, new_img, step + 1))
+#         else:
+#             self.current_pil = new_img
+#
+#     # ------------------- UPDATE LABEL -------------------
+#     def _update_label(self, pil_image):
+#         self.my_image = ctk.CTkImage(light_image=pil_image, size=(850, 550))
+#         self.image_label.configure(image=self.my_image)
