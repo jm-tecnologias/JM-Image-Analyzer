@@ -5,58 +5,61 @@ from PIL import Image
 
 from utils.CarouselWidgets import CarouselWidgets
 
+import customtkinter as ctk
+from PIL import Image
+
 
 class ImageView:
 
     def __init__(self, master):
 
         self.master = master
-
-        # 🔥 impedir resize automático
         self.master.pack_propagate(False)
 
+        self.image_label = ctk.CTkLabel(
+            self.master,
+            text=""
+        )
+        self.image_label.pack(pady=40)
+
+        self.current_pil = None
+        self.setImage('assets/logo.png')
+
+    # ------------------------------
+    # SET IMAGE COM TRANSIÇÃO
+    # ------------------------------
+    def setImage(self, path):
+        new_image = Image.open(path).convert("RGBA").resize((850, 550))
+
+        if self.current_pil is None:
+            self.current_pil = new_image
+            self._update_label(new_image)
+            return
+
+        # converter a imagem antiga também
+        old_image = self.current_pil.convert("RGBA")
+
+        self._fade_transition(old_image, new_image)
+    # ------------------------------
+    # ANIMAÇÃO FADE
+    # ------------------------------
+    def _fade_transition(self, old_img, new_img, step=0):
+        alpha = step / 10
+        blended = Image.blend(old_img, new_img, alpha)
+        self._update_label(blended)
+        if step < 10:
+            self.master.after(30, lambda: self._fade_transition(old_img, new_img, step + 1))
+        else:
+            self.current_pil = new_img
+
+    # ------------------------------
+    # UPDATE LABEL
+    # ------------------------------
+    def _update_label(self, pil_image):
+
         self.my_image = ctk.CTkImage(
-            light_image=Image.open("assets/ico.png"),
-            dark_image=Image.open("assets/ico2.png"),
+            light_image=pil_image,
             size=(850, 550)
         )
 
-        self.image_label = ctk.CTkLabel(
-            master,
-            image=self.my_image,
-            text=""
-        )
-
-        self.image_label.pack(pady=40)
-
-    def loadCarousel(self, dataSource, frame):
-        paths = ['assets/photo.jpg']
-        if len(dataSource) > 0:
-            paths = []
-
-        for item in dataSource.values():
-
-            path = item.get('absolutePath')
-
-            if path and os.path.isfile(path):
-                paths.append(path)
-
-        # CALLBACK REGISTADO
-        self.carousel = CarouselWidgets(
-            on_change=self.update_image_details)
-
-        self.carousel.createCarousel(
-            frame,
-            paths
-        )
-
-    def update_image_details(self, details=None):
-
-        print("NOVOS DETALHES RECEBIDOS:")
-        print(details)
-        print(details['locationDetails']['latitude'])
-        print(details['locationDetails']['longitude'])
-        print(details['locationDetails']['altitude'])
-
-
-
+        self.image_label.configure(image=self.my_image)

@@ -64,54 +64,6 @@ class App:
         self.scrollPane.grid(row=1, column=0, sticky='nswe', pady=(26,80), padx=20)
 
 
-        # ---------- Folder Details ----------
-        # self.palletFolderDetails = ctk.CTkFrame(self.palletFrame)
-        # self.palletFolderDetails.grid(row=2, column=0, sticky='we', padx=5, pady=5)
-
-
-        # self.lab = ctk.CTkLabel(
-        #     self.palletFolderDetails,
-        #     text='Site Details',
-        #     font=('Berlin Sans FB Demi', 24)
-        # )
-        # self.lab.pack(anchor='w', fill='x')
-
-        # self.lab2 = ctk.CTkLabel(
-        #     self.palletFolderDetails,
-        #     text='Src:',
-        #     font=('Comic Sans MS', 12),
-        #     # wraplength=210, # px
-        #     anchor='w'
-        # )
-        # self.lab2.pack(anchor='w', fill='x')
-        #
-        # self.lab3 = ctk.CTkLabel(
-        #     self.palletFolderDetails,
-        #     text='File Counter:',
-        #     font=('Comic Sans MS', 12),
-        #     anchor='w'
-        # )
-        # self.lab3.pack(anchor='w', fill='x')
-
-        # self.lab4 = ctk.CTkLabel(
-        #     self.palletFolderDetails,
-        #     text='Folder Size:',
-        #     font=('Comic Sans MS', 12),
-        #     anchor='w'
-        # )
-        # self.lab4.pack(anchor='w', fill='x')
-        #
-        # self.lab5 = ctk.CTkLabel(
-        #     self.palletFolderDetails,
-        #     text='Created At:',
-        #     font=('Comic Sans MS', 12),
-        #     anchor='w'
-        # )
-        # self.lab5.pack(anchor='w', fill='x')
-
-
-
-
 
         # Center
         self.center_frame = ctk.CTkFrame(self.main_frame)
@@ -134,9 +86,6 @@ class App:
 
 
 
-        #  Cria Carousel
-        # self.loadCarousel()
-
         # ---------- MetaData Details ---------
 
         self.metaDataDetails = ctk.CTkFrame(self.center_frame)
@@ -154,75 +103,93 @@ class App:
 
         self.imageScrollPane.grid(row=0, column=0, sticky="nswe")
 
-        # _____________________ Group I _____________________
-
-
-        self.icon = ctk.CTkImage(
-            light_image=Image.open("assets/ico.png"),
-            dark_image=Image.open("assets/ico2.png"),
-            size=(180, 180)  # tamanho do ícone
-        )
-
-        ctk.CTkButton(
-            self.imageScrollPane,
-            text="",
-            image=self.icon,
-            fg_color="transparent",
-            # hover_color="#1f6aa5",
-        #     # command=self.save_user
-            # width=90,
-            # height=90
-        ).pack(side="left", padx=5)
-        ctk.CTkButton(
-            self.imageScrollPane,
-            text="",
-            image=self.icon,
-            fg_color="transparent",
-            # hover_color="#1f6aa5",
-            #     # command=self.save_user
-            # width=90,
-            # height=90
-        ).pack(side="left", padx=5)
-        ctk.CTkButton(
-            self.imageScrollPane,
-            text="",
-            image=self.icon,
-            fg_color="transparent",
-            # hover_color="#1f6aa5",
-            #     # command=self.save_user
-            # width=90,
-            # height=90
-        ).pack(side="left", padx=5)
-        ctk.CTkButton(
-            self.imageScrollPane,
-            text="",
-            image=self.icon,
-            fg_color="transparent",
-            # hover_color="#1f6aa5",
-            #     # command=self.save_user
-            # width=90,
-            # height=90
-        ).pack(side="left", padx=5)
-        ctk.CTkButton(
-            self.imageScrollPane,
-            text="",
-            image=self.icon,
-            fg_color="transparent",
-            # hover_color="#1f6aa5",
-            #     # command=self.save_user
-            # width=90,
-            # height=90
-        ).pack(side="left", padx=5)
 
 
         # Right
-        self.right_frame = ctk.CTkFrame(self.main_frame)
-        self.right_frame.grid(row=1, column=2, sticky='nswe', padx = 2)
+        self.detaisFrame = ctk.CTkFrame(self.main_frame)
+        self.detaisFrame.grid(row=1, column=2, sticky='nswe')
+
+        # coluna única expansível
+        self.detaisFrame.columnconfigure(0, weight=1)
+        #
+        # ⭐ Header / Content /
+        self.detaisFrame.rowconfigure(0, weight=0)  # title
+        self.detaisFrame.rowconfigure(1, weight=1)  # scroll area
+
+        # ---------- Title ----------
+        ctk.CTkLabel(
+            self.detaisFrame,
+            text='Selected Image Details',
+            font=('Berlin Sans FB Demi', 32)
+        ).grid(row=0, column=0, sticky='we', pady=(40, 10))
+
+        self.detais = ctk.CTkFrame(self.detaisFrame)
+        self.detais.grid(row=1, column=0, sticky='nswe', padx=20, pady=26)
+
+        ctk.CTkLabel(
+            self.detais,
+            text='Data',
+            font=('Berlin Sans FB Demi', 32)
+        ).pack( pady=(40, 10))
+
+
+        ctk.CTkLabel(
+            self.detais,
+            text='Data',
+            font=('Berlin Sans FB Demi', 32)
+        ).pack(pady=(40, 10))
+
+        ctk.CTkLabel(
+            self.detais,
+            text='Data',
+            font=('Berlin Sans FB Demi', 32)
+        ).pack(pady=(40, 10))
+
+        ctk.CTkLabel(
+            self.detais,
+            text='Data',
+            font=('Berlin Sans FB Demi', 32)
+        ).pack(pady=(40, 10))
+
+        ctk.CTkLabel(
+            self.detais,
+            text='Actions',
+            font=('Berlin Sans FB Demi', 32)
+        ).pack(pady=(40, 10))
+
+        ctk.CTkButton(
+            self.detais,
+            text="Export",
+            fg_color="transparent",
+            # hover_color="#1f6aa5",
+            #     # command=self.save_user
+            # width=90,
+            # height=90
+        ).pack( padx=5)
+        ctk.CTkButton(
+            self.detais,
+            text="Action 1",
+            fg_color="transparent",
+            # hover_color="#1f6aa5",
+            #     # command=self.save_user
+            # width=90,
+            # height=90
+        ).pack(padx=5)
+        ctk.CTkButton(
+            self.detais,
+            text="Action 2",
+            fg_color="transparent",
+            # hover_color="#1f6aa5",
+            #     # command=self.save_user
+            # width=90,
+            # height=90
+        ).pack(padx=5)
 
         self.createTabs()
-        # Load File Function
-        self.loadImageList()
+        self.loadImagesDir()
 
+    def previewImage(self, path):
+        self.imageView.setImage(path)
 
     def createTabs(self):
 
@@ -230,9 +197,6 @@ class App:
         self.tabview = ctk.CTkTabview(self.center_frame)
         self.tabview.grid(row=1, column=0, sticky="nsew", padx=10, pady=10)
 
-        # # permitir expandir
-        # self.center_frame.rowconfigure(0, weight=1)
-        # self.center_frame.columnconfigure(0, weight=1)
 
         # Criar abas
         self.tab_carousel = self.tabview.add("Carousel")
@@ -240,101 +204,135 @@ class App:
         self.tab_normal = self.tabview.add("Normal Map")
 
         # Carregar conteúdo das abas
-        ImageView(self.tab_carousel)
+
+        # ⭐ GUARDA A INSTÂNCIA
+        self.imageView = ImageView(self.tab_carousel)
         SateliteMap(self.tab_satelite)
         NormalMap(self.tab_normal)
 
+    # Funcao para carregar botoes com um preview das imagens
+    def carouselButtonLoader(self, path):
 
-    def loadImageList(self):
-        path = 'C:/Users/JM-Tecnologias/Downloads/metadata extraction project'
+        # ---------- limpar dados antigos ----------
+        self.dataSource = {}
 
-        # Mostrar loader
-        loader = ctk.CTkLabel(self.scrollPane, text="Loading...", font=('Berlin Sans FB Demi', 20))
+        for widget in self.imageScrollPane.winfo_children():
+            widget.destroy()
+
+        # ---------- guardar pasta raiz ----------
+        self.dataSource[0] = {
+            'srcPath': path,
+            'type': 'root'
+        }
+
+        valid_extensions = ('.jpg', '.jpeg', '.png')
+
+        # ---------- listar imagens ----------
+        idx = 1
+
+        for entry in os.scandir(path):
+
+            if entry.is_file() and entry.name.lower().endswith(valid_extensions):
+                # guardar no datasource
+                self.dataSource[idx] = {
+                    'file': entry.name,
+                    'absolutePath': entry.path,
+                    'type': 'image'
+                }
+                # ---------- carregar ícone ----------
+                icon = ctk.CTkImage(
+                    light_image=Image.open(entry.path),
+                    size=(180, 180)  # tamanho do ícone
+                )
+
+                ctk.CTkButton(
+                    self.imageScrollPane,
+                    text="",
+                    image=icon,
+                    hover_color="#333",
+                    fg_color="transparent",
+                    command=lambda p=entry.path: self.previewImage(p)
+                ).pack(side="left", padx=5)
+
+
+
+
+    def loadImagesDir(self):
+
+        path = 'C:/Users/JM-Tecnologias/Downloads'
+
+        # ---------- Loader ----------
+        loader = ctk.CTkLabel(
+            self.scrollPane,
+            text="Loading...",
+            font=('Berlin Sans FB Demi', 20)
+        )
         loader.pack(pady=20)
 
         progress = ctk.CTkProgressBar(self.scrollPane, width=200)
         progress.pack(pady=10)
         progress.set(0)
 
-        self.root.update()  # Forçar redraw para mostrar o loader antes de processar
+        self.root.update()
 
-        # Limpar dados antigos
+        # ---------- limpar ----------
         self.dataSource = {}
+
         for widget in self.scrollPane.winfo_children():
             if widget not in (loader, progress):
                 widget.destroy()
 
-        valid_extensions = ('.jpg', '.jpeg', '.png')
-        self.dataSource[0] = {'srcPath': path}
-
-        files = [f for f in os.listdir(path) if f.lower().endswith(valid_extensions)]
-        total_files = len(files)
-
-        self.icon = ctk.CTkImage(
-            light_image=Image.open("assets/ico.png"),
-            dark_image=Image.open("assets/ico2.png"),
-            size=(48, 48)  # tamanho do ícone
-        )
-
-        # Carregar cada arquivo com update do progress
-        for idx, file in enumerate(files, start=1):
-            full_path = os.path.join(path, file)
-            self.dataSource[idx] = {'absolutePath': full_path, 'file': file}
+        # guardar pasta raiz
+        self.dataSource[0] = {
+            "srcPath": path,
+            "type": "root"
+        }
 
 
+        # ---------- LISTAR DIRECTORIAS ----------
+        folders = []
+
+        for entry in os.scandir(path):
+
+            if entry.is_dir():
+                folders.append(entry)
+
+        total_folders = len(folders)
+
+        # ---------- UI LOAD ----------
+        for idx, entry in enumerate(folders, start=1):
+            folder_name = entry.name
+            folder_path = entry.path  # ⭐ caminho completo
+
+            # ⭐ DATA SOURCE
+            self.dataSource[idx] = {
+                "name": folder_name,
+                "absolutePath": folder_path,
+                "type": "folder"
+            }
 
             lab = ctk.CTkLabel(
                 self.scrollPane,
-                text=f"➡ {file}",
-                image=self.icon,
+                text=f"📁 {folder_name}",
                 compound='left',
                 font=('Comic Sans MS', 16),
                 anchor='w'
             )
+
             lab.pack(fill='x', padx=8, pady=2)
 
+            # ⭐ IMPORTANTÍSSIMO (bug clássico evitado)
             lab.bind(
                 "<Button-1>",
-                lambda e, widget=lab, data=self.dataSource[idx]: self.on_click(e, widget, data)
+                lambda e, widget=lab, data=self.dataSource[idx]:
+                self.on_click(e, widget, data)
             )
 
-            progress.set(idx / total_files)  # Atualiza barra de progresso
-            self.root.update()  # Redesenha a interface
+            progress.set(idx / total_folders)
+            self.root.update()
 
-        # Remover loader
         loader.destroy()
         progress.destroy()
-
-
-
-
-        # self.loadCarousel()
-
-
-    def ellipsis_path(self, widget, text, max_width):
-        font = tkfont.Font(font=widget.cget("font"))
-
-        # se couber, retorna normal
-        if font.measure(text) <= max_width:
-            return text
-
-        left = 0
-        right = len(text)
-
-        while left < right:
-            left_part = text[:left]
-            right_part = text[len(text) - right:]
-            candidate = f"{left_part}...{right_part}"
-
-            if font.measure(candidate) <= max_width:
-                return candidate
-
-            if left <= right:
-                right -= 1
-            else:
-                left += 1
-
-        return "..."
 
     def on_click(self, event, widget, data):
 
@@ -347,37 +345,7 @@ class App:
 
         self.selected_item = widget
 
-        print(f"Selecionaste: {data.get('file')}")
-
-    # def loadCarousel(self):
-    #     paths = ['assets/photo.jpg']
-    #     if len(self.dataSource) > 0:
-    #         paths = []
-    #
-    #     for item in self.dataSource.values():
-    #
-    #         path = item.get('absolutePath')
-    #
-    #         if path and os.path.isfile(path):
-    #             paths.append(path)
-    #
-    #     # ⭐ CALLBACK REGISTADO
-    #     self.carousel = CarouselWidgets(
-    #         on_change=self.update_image_details)
-    #
-    #     self.carousel.createCarousel(
-    #         self.center_frame,
-    #         paths
-    #     )
-    #
-    # def update_image_details(self, details=None):
-    #
-    #     print("NOVOS DETALHES RECEBIDOS:")
-    #     print(details)
-    #     print(details['locationDetails']['latitude'])
-    #     print(details['locationDetails']['longitude'])
-    #     print(details['locationDetails']['altitude'])
-    #
+        self.carouselButtonLoader(data.get('absolutePath'))
 
 
 
