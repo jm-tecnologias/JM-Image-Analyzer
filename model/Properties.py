@@ -1,4 +1,7 @@
 import customtkinter as ctk
+from PIL import Image
+from PIL.ExifTags import TAGS
+
 class Properties:
     def __init__(self, master):
         self.master = master
@@ -9,12 +12,15 @@ class Properties:
         self.detaisFrame = ctk.CTkFrame(master)
         self.detaisFrame.grid(row=0, column=2, sticky='nswe')
 
+
         # coluna única expansível
         self.detaisFrame.columnconfigure(0, weight=1)
         #
         # ⭐ Header / Content /
         self.detaisFrame.rowconfigure(0, weight=0)  # title
         self.detaisFrame.rowconfigure(1, weight=1)  # scroll area
+        # self.detaisFrame.grid_propagate(False)
+
 
         # ---------- Title ----------
         ctk.CTkLabel(
@@ -30,6 +36,8 @@ class Properties:
         self.detais.grid(row=1, column=0, sticky='nswe', padx=20, pady=(26, 0))
 
         self.detais.grid_columnconfigure(0, weight=1)
+        # self.detais.grid_propagate(False)
+
 
         row = 0
 
@@ -39,34 +47,47 @@ class Properties:
             text='Device Detalis',
             font=('Berlin Sans FB Demi', 32),
             anchor='w'
-        ).grid(row=row, column=0, sticky='we', pady=(20, 10), padx=40)
+        ).grid(row=row, column=0, sticky='we', pady=(20, 10), padx=20)
         row += 1
 
-        deviceMaker = ctk.CTkLabel(
+        self.deviceMaker = ctk.CTkLabel(
             self.detais,
-            text='Camera: GoPro',
-            font=('Comic Sans MS', 18),
+            text='Camera: N/A',
+            font=('Comic Sans MS', 14),
             anchor='w'
+
         )
-        deviceMaker.grid(row=row, column=0, sticky='we', padx=40)
+        self.deviceMaker.grid(row=row, column=0, sticky='we', padx=(20,0))
         row += 1
 
-        deviceModel = ctk.CTkLabel(
+        self.deviceModel = ctk.CTkLabel(
             self.detais,
-            text='Model: GoPro Max',
-            font=('Comic Sans MS', 18),
+            text='Model: N/A',
+            font=('Comic Sans MS', 14),
             anchor='w'
         )
-        deviceModel.grid(row=row, column=0, sticky='we', padx=40)
+        self.deviceModel.grid(row=row, column=0, sticky='we', padx=(20,0))
         row += 1
 
-        deviceSoftware = ctk.CTkLabel(
+        ctk.CTkLabel(
             self.detais,
-            text='Software: Adobe Lightroom',
-            font=('Comic Sans MS', 18),
+            text='Software:',
+            font=('Comic Sans MS', 14),
             anchor='w'
+            # wraplength=353,
+            # bg_color='red'
+        ).grid(row=row, column=0, sticky='we', padx=(20,0))
+        row += 1
+
+        self.deviceSoftware = ctk.CTkLabel(
+            self.detais,
+            text='N/A',
+            font=('Comic Sans MS', 14),
+            anchor='w'
+            # wraplength=353,
+            # bg_color='red'
         )
-        deviceSoftware.grid(row=row, column=0, sticky='we', padx=40)
+        self.deviceSoftware.grid(row=row, column=0, sticky='we', padx=(20, 0))
         row += 1
 
         # ---------- GPS Details ----------
@@ -75,34 +96,38 @@ class Properties:
             text='GPS Detalis',
             font=('Berlin Sans FB Demi', 32),
             anchor='w'
-        ).grid(row=row, column=0, sticky='we', pady=(20, 10), padx=40)
+            # bg_color='red'
+        ).grid(row=row, column=0, sticky='we', pady=(20, 10), padx=20)
         row += 1
 
-        gpsLatitude = ctk.CTkLabel(
+        self.gpsLatitude = ctk.CTkLabel(
             self.detais,
-            text='Latitude: -25.4342423',
-            font=('Comic Sans MS', 18),
+            text='Latitude: N/A',
+            font=('Comic Sans MS', 14),
             anchor='w'
+            # bg_color='red'
         )
-        gpsLatitude.grid(row=row, column=0, sticky='we', padx=40)
+        self.gpsLatitude.grid(row=row, column=0, sticky='we', padx=(20,0))
         row += 1
 
-        gpsLongitude = ctk.CTkLabel(
+        self.gpsLongitude = ctk.CTkLabel(
             self.detais,
-            text='Longitude: 35.3424234',
-            font=('Comic Sans MS', 18),
+            text='Longitude: N/A',
+            font=('Comic Sans MS', 14),
             anchor='w'
+            # bg_color='red'
         )
-        gpsLongitude.grid(row=row, column=0, sticky='we', padx=40)
+        self.gpsLongitude.grid(row=row, column=0, sticky='we', padx=(20,0))
         row += 1
 
-        gpsAltitude = ctk.CTkLabel(
+        self.gpsAltitude = ctk.CTkLabel(
             self.detais,
-            text='Altitude: 523,45',
-            font=('Comic Sans MS', 18),
+            text='Altitude: N/A',
+            font=('Comic Sans MS', 14),
             anchor='w'
+            # bg_color='red'
         )
-        gpsAltitude.grid(row=row, column=0, sticky='we', padx=40)
+        self.gpsAltitude.grid(row=row, column=0, sticky='we', padx=(20,0))
         row += 1
 
         # ---------- Image Specifications ----------
@@ -111,52 +136,52 @@ class Properties:
             text='Image Specifications',
             font=('Berlin Sans FB Demi', 32),
             anchor='w'
-        ).grid(row=row, column=0, sticky='we', pady=(20, 10), padx=40)
+        ).grid(row=row, column=0, sticky='we', pady=(20, 10), padx=20)
         row += 1
 
-        ExposureTime = ctk.CTkLabel(
+        self.ExposureTime = ctk.CTkLabel(
             self.detais,
-            text='ExposureTime: 145',
-            font=('Comic Sans MS', 18),
+            text='Exposure Time: N/A',
+            font=('Comic Sans MS', 14),
             anchor='w'
         )
-        ExposureTime.grid(row=row, column=0, sticky='we', padx=40)
+        self.ExposureTime.grid(row=row, column=0, sticky='we', padx=20)
         row += 1
 
-        ShutterSpeedValue = ctk.CTkLabel(
+        self.ShutterSpeedValue = ctk.CTkLabel(
             self.detais,
-            text='ShutterSpeedValue: 120',
-            font=('Comic Sans MS', 18),
+            text='Shutter Speed Value: N/A',
+            font=('Comic Sans MS', 14),
             anchor='w'
         )
-        ShutterSpeedValue.grid(row=row, column=0, sticky='we', padx=40)
+        self.ShutterSpeedValue.grid(row=row, column=0, sticky='we', padx=20)
         row += 1
 
-        IOSSpeeddRatings = ctk.CTkLabel(
+        self.IOSSpeeddRatings = ctk.CTkLabel(
             self.detais,
-            text='IOS Speedd Ratings: 100',
-            font=('Comic Sans MS', 18),
+            text='IOS Speedd Ratings: N/A',
+            font=('Comic Sans MS', 14),
             anchor='w'
         )
-        IOSSpeeddRatings.grid(row=row, column=0, sticky='we', padx=40)
+        self.IOSSpeeddRatings.grid(row=row, column=0, sticky='we', padx=20)
         row += 1
 
-        FocalLength = ctk.CTkLabel(
+        self.FocalLength = ctk.CTkLabel(
             self.detais,
             text='Focal Length: 523,45',
-            font=('Comic Sans MS', 18),
+            font=('Comic Sans MS', 14),
             anchor='w'
         )
-        FocalLength.grid(row=row, column=0, sticky='we', padx=40)
+        self.FocalLength.grid(row=row, column=0, sticky='we', padx=20)
         row += 1
 
-        FocalLengthIn35mmFilm = ctk.CTkLabel(
+        self.FocalLengthIn35mmFilm = ctk.CTkLabel(
             self.detais,
-            text='Focal LengthIn 35mm Film: 523,45',
-            font=('Comic Sans MS', 18),
+            text='Focal LengthIn 35mm Film: N/A',
+            font=('Comic Sans MS', 14),
             anchor='w'
         )
-        FocalLengthIn35mmFilm.grid(row=row, column=0, sticky='we', padx=40)
+        self.FocalLengthIn35mmFilm.grid(row=row, column=0, sticky='we', padx=20)
         row += 1
 
         # ---------- Date Specifications ----------
@@ -165,34 +190,34 @@ class Properties:
             text='Date Specifications',
             font=('Berlin Sans FB Demi', 32),
             anchor='w'
-        ).grid(row=row, column=0, sticky='we', pady=(20, 10), padx=40)
+        ).grid(row=row, column=0, sticky='we', pady=(20, 10), padx=20)
         row += 1
 
-        DateTimeOrigin = ctk.CTkLabel(
+        self.DateTimeOriginal = ctk.CTkLabel(
             self.detais,
-            text='DateTimeOrigin: GoPro',
-            font=('Comic Sans MS', 18),
+            text='Date&Time Original: N/A',
+            font=('Comic Sans MS', 14),
             anchor='w'
         )
-        DateTimeOrigin.grid(row=row, column=0, sticky='we', padx=40)
+        self.DateTimeOriginal.grid(row=row, column=0, sticky='we', padx=20)
         row += 1
 
-        DateTimeDigitized = ctk.CTkLabel(
+        self.DateTimeDigitized = ctk.CTkLabel(
             self.detais,
-            text='DateTimeDigitized: GoPro Max',
-            font=('Comic Sans MS', 18),
+            text='DateTimeDigitized: N/A',
+            font=('Comic Sans MS', 14),
             anchor='w'
         )
-        DateTimeDigitized.grid(row=row, column=0, sticky='we', padx=40)
+        self.DateTimeDigitized.grid(row=row, column=0, sticky='we', padx=20)
         row += 1
 
-        OffatTime = ctk.CTkLabel(
+        self.OffsetTime = ctk.CTkLabel(
             self.detais,
-            text='OffatTime: Adobe Lightroom',
-            font=('Comic Sans MS', 18),
+            text='OffsetTime: N/A',
+            font=('Comic Sans MS', 14),
             anchor='w'
         )
-        OffatTime.grid(row=row, column=0, sticky='we', padx=40)
+        self.OffsetTime.grid(row=row, column=0, sticky='we', padx=20)
 
         # ---------- BUTTON FRAME DETAILS ----------
 
@@ -261,3 +286,45 @@ class Properties:
             fg_color="transparent",
             height=40
         ).grid(row=1, column=1, padx=5, pady=5, sticky="we")
+
+    def getImageData(self, path = None):
+        self.metaDataSouce = {}
+
+        img = Image.open(path)
+
+        exifData = img._getexif()
+        if exifData:
+            for tag_id, value in exifData.items():
+                tag = TAGS.get(tag_id, tag_id)
+
+                self.metaDataSouce[tag] = value
+
+        return self.metaDataSouce
+
+    def updateImageProperties(self, path):
+
+        data = self.getImageData(path)
+
+        # -------- DEVICE ----------
+        self.deviceMaker.configure(text=f"Camera: {data.get('Make', 'N/A')}")
+        self.deviceModel.configure(text=f"Model: {data.get('Model', 'N/A')}")
+        self.deviceSoftware.configure(text=f"{data.get('Software', 'N/A')}")
+        # -------- GPS ----------
+        gps = data.get('GPSInfo')
+
+        if gps:
+            self.gpsLatitude.configure(text=f"Latitude: {gps.get(2, 'N/A')}")
+
+            self.gpsLongitude.configure(text=f"Longitude: {gps.get(4, 'N/A')}")
+
+            self.gpsAltitude.configure(text=f"Altitude: {gps.get(6, 'N/A')}")
+            # ---------- Image Specifications ----------
+        self.ExposureTime.configure(text=f"Exposure Time: {data.get('ExposureTime','N/A')}")
+        self.ShutterSpeedValue.configure(text=f"Shutter Speed Value: {data.get('ShutterSpeedValue','N/A')}")
+        self.IOSSpeeddRatings.configure(text=f"IOS Speed Ratings: {data.get('ISOSpeedRatings','N/A')}")
+        self.FocalLength.configure(text=f"Focal Length: {data.get('FocalLength','N/A')}")
+        self.FocalLengthIn35mmFilm.configure(text=f"Focal Length In 35mm Film: {data.get('FocalLengthIn35mmFilm','N/A')}")
+            # ---------- Date Specifications ----------
+        self.DateTimeOriginal.configure(text=f"Date/Time Original: {data.get('DateTimeOriginal','N/A')}")
+        self.DateTimeDigitized.configure(text=f"Date/Time Digitized: {data.get('DateTimeDigitized','N/A')}")
+        self.OffsetTime.configure(text=f"OffsetTime: {data.get('OffsetTime','N/A')}")

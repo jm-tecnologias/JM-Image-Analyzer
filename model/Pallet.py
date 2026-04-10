@@ -97,11 +97,14 @@ class Pallet:
                 ).pack(side="left", padx=5)
 
 
-
     # def previewImage(self, path):
-    #     self.imageView.setImage(path)
+    #     self.on_image_selected(path)
     def previewImage(self, path):
-        self.on_image_selected(path)
+
+        # dispara evento externo
+        if self.on_image_selected:
+            self.on_image_selected(path)
+
 
     def loadImagesDir(self):
 

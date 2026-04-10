@@ -20,7 +20,7 @@ class ImageView:
             self.master,
             text=""
         )
-        self.image_label.pack(pady=40)
+        self.image_label.pack(fill='both', expand=True)
 
         self.current_pil = None
         self.setImage('assets/logo.png')
@@ -29,7 +29,7 @@ class ImageView:
     # SET IMAGE COM TRANSIÇÃO
     # ------------------------------
     def setImage(self, path):
-        new_image = Image.open(path).convert("RGBA").resize((850, 550))
+        new_image = Image.open(path).convert("RGBA").resize((890, 850))
 
         if self.current_pil is None:
             self.current_pil = new_image
@@ -59,32 +59,23 @@ class ImageView:
 
         self.my_image = ctk.CTkImage(
             light_image=pil_image,
-            size=(850, 550)
+            size=(890, 850)
         )
 
         self.image_label.configure(image=self.my_image)
 
+
+#
+# import customtkinter as ctk
+# from PIL import Image
+#
 # class ImageView:
 #     def __init__(self, master):
 #         self.master = master
 #         self.master.pack_propagate(False)
 #
-#         # ------------------- Frame principal -------------------
-#         self.imageFrame = ctk.CTkFrame(master)
-#         self.imageFrame.grid(row=0, column=0, sticky='nswe', padx=10, pady=10)
-#         self.imageFrame.columnconfigure(0, weight=1)
-#         self.imageFrame.rowconfigure(1, weight=1)
-#
-#         # ------------------- Título -------------------
-#         self.titleLabel = ctk.CTkLabel(
-#             self.imageFrame,
-#             text="Image Preview",
-#             font=("Berlin Sans FB Demi", 32)
-#         )
-#         self.titleLabel.grid(row=0, column=0, sticky='we', pady=(20, 10))
-#
 #         # ------------------- Label da imagem -------------------
-#         self.image_label = ctk.CTkLabel(self.imageFrame, text="")
+#         self.image_label = ctk.CTkLabel(master, text="", bg_color='red')
 #         self.image_label.grid(row=1, column=0, sticky='nswe', pady=10)
 #
 #         # ------------------- Estado interno -------------------

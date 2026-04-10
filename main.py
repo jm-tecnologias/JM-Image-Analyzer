@@ -33,9 +33,6 @@ class App:
         self.main_frame.rowconfigure(0, weight=1)
 
 
-
-
-
         # Center
         self.centerFrame = ctk.CTkFrame(self.main_frame)
         self.centerFrame.grid(row=0, column=1, sticky='nswe')
@@ -55,8 +52,18 @@ class App:
         # Chama TODA a interface da classe Properties
         self.properties = Properties(self.main_frame)
         self.createTabs()
-        self.pallet = Pallet(self.main_frame, self.centerFrame, self.imageView)
-        self.pallet = Pallet(self.main_frame, self.centerFrame, on_image_selected=self.imageView.setImage)
+        self.pallet = Pallet(
+            self.main_frame,
+            self.centerFrame,
+            on_image_selected=self.onImageSelected
+        )
+
+    def onImageSelected(self, path):
+        # 1️⃣ Preview
+        self.imageView.setImage(path)
+
+        # 2️⃣ Properties
+        self.properties.updateImageProperties(path)
 
 
     def createTabs(self):
@@ -85,3 +92,7 @@ class App:
 if __name__ == '__main__':
     app = App()
     app.run()
+
+
+
+
