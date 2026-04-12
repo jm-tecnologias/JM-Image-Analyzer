@@ -96,9 +96,6 @@ class Pallet:
                     command=lambda p=entry.path: self.previewImage(p)
                 ).pack(side="left", padx=5)
 
-
-    # def previewImage(self, path):
-    #     self.on_image_selected(path)
     def previewImage(self, path):
 
         # dispara evento externo
