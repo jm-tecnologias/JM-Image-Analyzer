@@ -1,28 +1,65 @@
-
-import customtkinter as ctk
+from tkintermapview import TkinterMapView
 
 
 class SateliteMap:
 
-    def __init__(self, master):
-
+    def __init__(self, master, LAT_INICIAL=-25.9692, LON_INICIAL=32.5732):
         self.master = master
+        self.map_widget = None
+        self.master.pack_propagate(False)
+
+        self.seteliteMapWidgets(master, LAT_INICIAL, LON_INICIAL)
 
         # self.master.grid_columnconfigure(1, weight=1)
 
-        ctk.CTkLabel(master, text="User Name").grid(row=0, column=0, padx=10, pady=10)
+    def seteliteMapWidgets(self, frame, LAT_INICIAL, LON_INICIAL):
+        self.map_widget = TkinterMapView(frame, corner_radius=0)
+        # map_widget.pack(fill="both", expand=True)
+        self.map_widget.pack(fill='both', expand=True)
 
-        self.entry = ctk.CTkEntry(master)
-        self.entry.grid(row=0, column=1, sticky="ew", padx=10)
+        frame.columnconfigure(0, weight=1)
+        frame.rowconfigure(1, weight=1)
 
-        self.save_btn = ctk.CTkButton(
-            master,
-            text="Save User",
-            command=self.save_user
+        self.map_widget.set_tile_server(
+            "https://mt0.google.com/vt/lyrs=s&x={x}&y={y}&z={z}"
         )
-        self.save_btn.grid(row=1, column=1, pady=20)
 
-    def save_user(self):
-        print("User:", self.entry.get())
+        self.map_widget.set_position(LAT_INICIAL, LON_INICIAL)
+        self.map_widget.set_zoom(15)
 
+        # Marcador
+        self.map_widget.set_marker(LAT_INICIAL, LON_INICIAL)
 
+        return self.map_widget
+
+    def updatePosition(self, lat, lon, lat_ref=None, lon_ref=None):
+
+        # --- Converter se vier em DMS (tuple) ---
+        if isinstance(lat, tuple):
+            lat = self.converter_gps(lat)
+
+        if isinstance(lon, tuple):
+            lon = self.converter_gps(lon)
+
+        # --- Aplicar hemisfério ---
+        if lat_ref == "S":
+            lat = -abs(lat)
+
+        if lon_ref == "W":
+            lon = -abs(lon)
+
+        print("FINAL S:", lat, lon)
+
+        self.map_widget.set_position(lat, lon)
+        self.map_widget.set_marker(lat, lon)
+
+    def converter_gps(self, valor, ref=None):
+
+        graus, minutos, segundos = valor
+
+        decimal = graus + (minutos / 60.0) + (segundos / 3600.0)
+
+        if ref in ["S", "W"]:
+            decimal = -decimal
+
+        return decimal

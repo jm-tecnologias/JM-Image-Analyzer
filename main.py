@@ -1,9 +1,7 @@
 import customtkinter as ctk
-from model.ImageView import ImageView
+from model.Tabs import Tabs
 from model.Pallet import Pallet
 from model.Properties import Properties
-from model.SateliteMap import SateliteMap
-from model.NormalMap import NormalMap
 
 class App:
     def __init__(self):
@@ -33,56 +31,40 @@ class App:
         self.main_frame.rowconfigure(0, weight=1)
 
 
-        # Center
-        self.centerFrame = ctk.CTkFrame(self.main_frame)
-        self.centerFrame.grid(row=0, column=1, sticky='nswe')
+        # criar primeiro
+        self.tabs = Tabs(self.main_frame)
 
-        self.centerFrame.columnconfigure(0, weight=1)
-        self.centerFrame.rowconfigure(1, weight=4)
-        self.centerFrame.rowconfigure(2, weight=0)
-
-        # ---------- Title ----------
-        self.titleLabCenterFrame = ctk.CTkLabel(
-            self.centerFrame,
-            text='Image Preview',
-            font=('Berlin Sans FB Demi', 32)
-        )
-        self.titleLabCenterFrame.grid(row=0, column=0, sticky='we', pady=(40, 10))
-
-        # Chama TODA a interface da classe Properties
-        self.properties = Properties(self.main_frame)
-        self.createTabs()
+        # depois usar
         self.pallet = Pallet(
             self.main_frame,
-            self.centerFrame,
+            self.tabs.centerFrame,
             on_image_selected=self.onImageSelected
         )
 
-    def onImageSelected(self, path):
-        # 1️⃣ Preview
-        self.imageView.setImage(path)
+        self.properties = Properties(self.main_frame)
 
-        # 2️⃣ Properties
+    def onImageSelected(self, path):
+
+        self.tabs.getImageView().setImage(path)
+
         self.properties.updateImageProperties(path)
 
+        gps = self.properties.metaDataSouce.get("GPSInfo")
 
-    def createTabs(self):
-        # Criar TabView dentro do right_frame
-        self.tabview = ctk.CTkTabview(self.centerFrame)
-        self.tabview.grid(row=1, column=0, sticky="nsew", padx=10, pady=10)
+        if gps:
+            lat_ref = gps.get(1)
+            lat = gps.get(2)
+            lon_ref = gps.get(3)
+            lon = gps.get(4)
 
+            self.tabs.getSatelliteMap().updatePosition(
+                lat, lon, lat_ref, lon_ref
+            )
 
-        # Criar abas
-        self.tab_carousel = self.tabview.add("Carousel")
-        self.tab_satelite = self.tabview.add("Satelite Map")
-        self.tab_normal = self.tabview.add("Normal Map")
+            self.tabs.getNormalMap().updatePosition(
+                lat, lon, lat_ref, lon_ref
+            )
 
-        # Carregar conteúdo das abas
-
-        # ⭐ GUARDA A INSTÂNCIA
-        self.imageView = ImageView(self.tab_carousel)
-        SateliteMap(self.tab_satelite)
-        NormalMap(self.tab_normal)
 
 
 

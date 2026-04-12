@@ -1,2 +1,4 @@
-# pip install customtkinter
-# pip install pillow
+customtkinter~=5.2.2
+pillow~=12.2.0
+tkintermapview~=1.29
+future~=1.0.0
