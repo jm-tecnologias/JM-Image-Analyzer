@@ -262,14 +262,20 @@ class Properties:
             buttons_frame,
             text="Export",
             fg_color="transparent",
-            height=40
+            height=40,
+            bg_color="#1f6aa5",
+            corner_radius=0,
+            font=('Berlin Sans FB Demi', 16)
         ).grid(row=0, column=0, padx=5, pady=5, sticky="we")
 
         ctk.CTkButton(
             buttons_frame,
-            text="Action 1",
+            text="Batch Analysis",
             fg_color="transparent",
-            height=40
+            height=40,
+            bg_color="#1f6aa5",
+            corner_radius=0,
+            font=('Berlin Sans FB Demi', 16)
         ).grid(row=0, column=1, padx=5, pady=5, sticky="we")
 
         # -------- SEGUNDA LINHA --------
@@ -277,14 +283,20 @@ class Properties:
             buttons_frame,
             text="Action 3",
             fg_color="transparent",
-            height=40
+            height=40,
+            bg_color="#1f6aa5",
+            corner_radius=0,
+            font=('Berlin Sans FB Demi', 16)
         ).grid(row=1, column=0, padx=5, pady=5, sticky="we")
 
         ctk.CTkButton(
             buttons_frame,
             text="Action 4",
             fg_color="transparent",
-            height=40
+            height=40,
+            bg_color="#1f6aa5",
+            corner_radius=0,
+            font=('Berlin Sans FB Demi', 16)
         ).grid(row=1, column=1, padx=5, pady=5, sticky="we")
 
     def getImageData(self, path = None):
@@ -328,3 +340,4 @@ class Properties:
         self.DateTimeOriginal.configure(text=f"Date/Time Original: {data.get('DateTimeOriginal','N/A')}")
         self.DateTimeDigitized.configure(text=f"Date/Time Digitized: {data.get('DateTimeDigitized','N/A')}")
         self.OffsetTime.configure(text=f"OffsetTime: {data.get('OffsetTime','N/A')}")
+

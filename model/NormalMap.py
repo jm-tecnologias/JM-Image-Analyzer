@@ -7,11 +7,9 @@ class NormalMap:
         self.master = master
         self.map_widget = None
         self.master.pack_propagate(False)
+        self.marker = None
 
         self.openStreetMapWidgets(master, LAT_INICIAL, LON_INICIAL)
-
-        # self.master.grid_columnconfigure(1, weight=1)
-
 
     def openStreetMapWidgets(self, frame, LAT_INICIAL, LON_INICIAL):
         self.map_widget = TkinterMapView(frame, corner_radius=0)
@@ -19,6 +17,8 @@ class NormalMap:
 
         frame.columnconfigure(0, weight=1)
         frame.rowconfigure(2, weight=1)
+
+
 
         # 🌍 Usar mapa normal (OpenStreetMap)
         self.map_widget.set_tile_server(
@@ -29,30 +29,38 @@ class NormalMap:
         self.map_widget.set_zoom(15)
 
         # 📌 Marcador
-        self.map_widget.set_marker(LAT_INICIAL, LON_INICIAL)
+        # self.map_widget.set_marker(LAT_INICIAL, LON_INICIAL)
+        self.marker = self.map_widget.set_marker(LAT_INICIAL, LON_INICIAL)
 
         return self.map_widget
 
     def updatePosition(self, lat, lon, lat_ref=None, lon_ref=None):
 
-        # --- Converter se vier em DMS (tuple) ---
+        # Converter DMS
         if isinstance(lat, tuple):
             lat = self.converter_gps(lat)
 
         if isinstance(lon, tuple):
             lon = self.converter_gps(lon)
 
-        # --- Aplicar hemisfério ---
+        # Hemisfério
         if lat_ref == "S":
             lat = -abs(lat)
 
         if lon_ref == "W":
             lon = -abs(lon)
 
-        print("FINAL N:", lat, lon)
+        print("FINAL:", lat, lon)
 
+        # mover mapa
         self.map_widget.set_position(lat, lon)
-        self.map_widget.set_marker(lat, lon)
+
+        # remover marcador antigo
+        if self.marker:
+            self.marker.delete()
+
+        # criar novo marcador
+        self.marker = self.map_widget.set_marker(lat, lon)
 
     def converter_gps(self, valor, ref=None):
 

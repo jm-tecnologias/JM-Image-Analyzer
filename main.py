@@ -3,8 +3,10 @@ from model.Tabs import Tabs
 from model.Pallet import Pallet
 from model.Properties import Properties
 
+
 class App:
     def __init__(self):
+        # ICON
         self.dataSource = {}
         self.selected_item = None
         self.imageView = None
@@ -30,51 +32,17 @@ class App:
         self.main_frame.columnconfigure(2, weight=1)
         self.main_frame.rowconfigure(0, weight=1)
 
-
-        # criar primeiro
-        self.tabs = Tabs(self.main_frame)
-
-        # depois usar
-        self.pallet = Pallet(
-            self.main_frame,
-            self.tabs.centerFrame,
-            on_image_selected=self.onImageSelected
-        )
-
         self.properties = Properties(self.main_frame)
+        self.tabs = Tabs(self.main_frame, self.properties)
+        self.pallet = Pallet(self.main_frame, on_folder_selected=self.onFolderSelected)
 
-    def onImageSelected(self, path):
-
-        self.tabs.getImageView().setImage(path)
-
-        self.properties.updateImageProperties(path)
-
-        gps = self.properties.metaDataSouce.get("GPSInfo")
-
-        if gps:
-            lat_ref = gps.get(1)
-            lat = gps.get(2)
-            lon_ref = gps.get(3)
-            lon = gps.get(4)
-
-            self.tabs.getSatelliteMap().updatePosition(
-                lat, lon, lat_ref, lon_ref
-            )
-
-            self.tabs.getNormalMap().updatePosition(
-                lat, lon, lat_ref, lon_ref
-            )
-
-
-
+    def onFolderSelected(self, path):
+        self.tabs.carouselButtonLoader(path)
 
     def run(self):
         self.root.mainloop()
 
+
 if __name__ == '__main__':
     app = App()
     app.run()
-
-
-
-
