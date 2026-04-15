@@ -2,3 +2,5 @@ customtkinter~=5.2.2
 pillow~=12.2.0
 tkintermapview~=1.29
 future~=1.0.0
+reportlab~=4.4.10
+pydantic~=2.13.1

@@ -105,10 +105,10 @@ class Tabs:
     def getNormalMap(self):
         return self.normalMap
 
-    def botaoAcao(self):
-
-        if self.currentImage and self.properties:
-            self.properties.updateImageProperties(self.currentImage)
+    # def botaoAcao(self):
+    #
+    #     if self.currentImage and self.properties:
+    #         self.properties.updateImageProperties(self.currentImage)
 
 
     def carouselButtonLoader(self, path):

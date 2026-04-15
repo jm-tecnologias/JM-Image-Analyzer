@@ -2,16 +2,19 @@ import customtkinter as ctk
 from PIL import Image
 from PIL.ExifTags import TAGS
 
+from model.ImageModel import ImageModel
+
+
 class Properties:
     def __init__(self, master):
         self.master = master
         self.master.pack_propagate(False)
+        self.imageModel = None
 
         # ______________________ Ponto de teste_______________________
         # Right
         self.detaisFrame = ctk.CTkFrame(master)
         self.detaisFrame.grid(row=0, column=2, sticky='nswe')
-
 
         # coluna única expansível
         self.detaisFrame.columnconfigure(0, weight=1)
@@ -20,7 +23,6 @@ class Properties:
         self.detaisFrame.rowconfigure(0, weight=0)  # title
         self.detaisFrame.rowconfigure(1, weight=1)  # scroll area
         # self.detaisFrame.grid_propagate(False)
-
 
         # ---------- Title ----------
         ctk.CTkLabel(
@@ -37,7 +39,6 @@ class Properties:
 
         self.detais.grid_columnconfigure(0, weight=1)
         # self.detais.grid_propagate(False)
-
 
         row = 0
 
@@ -57,7 +58,7 @@ class Properties:
             anchor='w'
 
         )
-        self.deviceMaker.grid(row=row, column=0, sticky='we', padx=(20,0))
+        self.deviceMaker.grid(row=row, column=0, sticky='we', padx=(20, 0))
         row += 1
 
         self.deviceModel = ctk.CTkLabel(
@@ -66,7 +67,7 @@ class Properties:
             font=('Comic Sans MS', 14),
             anchor='w'
         )
-        self.deviceModel.grid(row=row, column=0, sticky='we', padx=(20,0))
+        self.deviceModel.grid(row=row, column=0, sticky='we', padx=(20, 0))
         row += 1
 
         ctk.CTkLabel(
@@ -76,7 +77,7 @@ class Properties:
             anchor='w'
             # wraplength=353,
             # bg_color='red'
-        ).grid(row=row, column=0, sticky='we', padx=(20,0))
+        ).grid(row=row, column=0, sticky='we', padx=(20, 0))
         row += 1
 
         self.deviceSoftware = ctk.CTkLabel(
@@ -107,7 +108,7 @@ class Properties:
             anchor='w'
             # bg_color='red'
         )
-        self.gpsLatitude.grid(row=row, column=0, sticky='we', padx=(20,0))
+        self.gpsLatitude.grid(row=row, column=0, sticky='we', padx=(20, 0))
         row += 1
 
         self.gpsLongitude = ctk.CTkLabel(
@@ -117,7 +118,7 @@ class Properties:
             anchor='w'
             # bg_color='red'
         )
-        self.gpsLongitude.grid(row=row, column=0, sticky='we', padx=(20,0))
+        self.gpsLongitude.grid(row=row, column=0, sticky='we', padx=(20, 0))
         row += 1
 
         self.gpsAltitude = ctk.CTkLabel(
@@ -127,7 +128,7 @@ class Properties:
             anchor='w'
             # bg_color='red'
         )
-        self.gpsAltitude.grid(row=row, column=0, sticky='we', padx=(20,0))
+        self.gpsAltitude.grid(row=row, column=0, sticky='we', padx=(20, 0))
         row += 1
 
         # ---------- Image Specifications ----------
@@ -299,7 +300,7 @@ class Properties:
             font=('Berlin Sans FB Demi', 16)
         ).grid(row=1, column=1, padx=5, pady=5, sticky="we")
 
-    def getImageData(self, path = None):
+    def getImageData(self, path=None):
         self.metaDataSouce = {}
 
         img = Image.open(path)
@@ -316,9 +317,11 @@ class Properties:
     def updateImageProperties(self, path):
 
         data = self.getImageData(path)
+        self.imageModel = self.build_image_model(data)
+
 
         # -------- DEVICE ----------
-        self.deviceMaker.configure(text=f"Camera: {data.get('Make', 'N/A')}")
+        self.deviceMaker.configure(text=f"Camera: {self.imageModel.make}")
         self.deviceModel.configure(text=f"Model: {data.get('Model', 'N/A')}")
         self.deviceSoftware.configure(text=f"{data.get('Software', 'N/A')}")
         # -------- GPS ----------
@@ -331,13 +334,79 @@ class Properties:
 
             self.gpsAltitude.configure(text=f"Altitude: {gps.get(6, 'N/A')}")
             # ---------- Image Specifications ----------
-        self.ExposureTime.configure(text=f"Exposure Time: {data.get('ExposureTime','N/A')}")
-        self.ShutterSpeedValue.configure(text=f"Shutter Speed Value: {data.get('ShutterSpeedValue','N/A')}")
-        self.IOSSpeeddRatings.configure(text=f"IOS Speed Ratings: {data.get('ISOSpeedRatings','N/A')}")
-        self.FocalLength.configure(text=f"Focal Length: {data.get('FocalLength','N/A')}")
-        self.FocalLengthIn35mmFilm.configure(text=f"Focal Length In 35mm Film: {data.get('FocalLengthIn35mmFilm','N/A')}")
-            # ---------- Date Specifications ----------
-        self.DateTimeOriginal.configure(text=f"Date/Time Original: {data.get('DateTimeOriginal','N/A')}")
-        self.DateTimeDigitized.configure(text=f"Date/Time Digitized: {data.get('DateTimeDigitized','N/A')}")
-        self.OffsetTime.configure(text=f"OffsetTime: {data.get('OffsetTime','N/A')}")
+        self.ExposureTime.configure(text=f"Exposure Time: {data.get('ExposureTime', 'N/A')}")
+        self.ShutterSpeedValue.configure(text=f"Shutter Speed Value: {data.get('ShutterSpeedValue', 'N/A')}")
+        self.IOSSpeeddRatings.configure(text=f"IOS Speed Ratings: {data.get('ISOSpeedRatings', 'N/A')}")
+        self.FocalLength.configure(text=f"Focal Length: {data.get('FocalLength', 'N/A')}")
+        self.FocalLengthIn35mmFilm.configure(
+            text=f"Focal Length In 35mm Film: {data.get('FocalLengthIn35mmFilm', 'N/A')}")
+        # ---------- Date Specifications ----------
+        self.DateTimeOriginal.configure(text=f"Date/Time Original: {data.get('DateTimeOriginal', 'N/A')}")
+        self.DateTimeDigitized.configure(text=f"Date/Time Digitized: {data.get('DateTimeDigitized', 'N/A')}")
+        self.OffsetTime.configure(text=f"OffsetTime: {data.get('OffsetTime', 'N/A')}")
 
+        print(self.imageModel)
+
+    def build_image_model(self, exif: dict) -> ImageModel:
+
+        gps_data = parse_gps_info(exif.get("GPSInfo"))
+
+        clean_data = {
+            "make": exif.get("Make"),
+            "model": exif.get("Model"),
+            "software": exif.get("Software"),
+            "gpsInfo": gps_data,
+
+            "ExposureTime": exif.get("ExposureTime", 0),
+            "ShutterSpeedValue": exif.get("ShutterSpeedValue", 0),
+            "ISOSpeedRatings": exif.get("ISOSpeedRatings", 0),
+            "FocalLength": exif.get("FocalLength", 0),
+            "FocalLengthIn35mmFilm": exif.get("FocalLengthIn35mmFilm", 0),
+            "DateTimeOriginal": exif.get("DateTimeOriginal", ""),
+            "DateTimeDigitized": exif.get("DateTimeDigitized", ""),
+            "OffsetTime": exif.get("OffsetTime", ""),
+        }
+
+        return ImageModel.model_validate(clean_data)
+
+
+def converter_gps(valor, ref=None):
+    graus, minutos, segundos = valor
+
+    decimal = graus + (minutos / 60.0) + (segundos / 3600.0)
+
+    if ref in ["S", "W"]:
+        decimal = -decimal
+
+    return decimal
+
+
+def parse_gps_info(gps_raw: dict):
+    if not gps_raw:
+        return None
+
+    lat_ref = gps_raw.get(1)
+    lat = gps_raw.get(2)
+    lon_ref = gps_raw.get(3)
+    lon = gps_raw.get(4)
+
+    lat = converter_gps(lat)
+    lon = converter_gps(lon)
+
+
+    # Hemisfério
+    if lat_ref == "S":
+        lat = -abs(lat)
+
+    if lon_ref == "W":
+        lon = -abs(lon)
+
+
+    alt = gps_raw.get(6)
+    altitude = alt
+
+    return {
+        "latitude": lat,
+        "longitude": lon,
+        "altitude": altitude
+    }
