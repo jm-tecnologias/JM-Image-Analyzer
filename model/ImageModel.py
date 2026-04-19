@@ -28,4 +28,6 @@ class ImageModel(BaseModel):
     DateTimeOriginal: str
     DateTimeDigitized: str
     OffsetTime: str
+    absolutePath: str
+    fileName: str
 

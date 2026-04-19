@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from reportlab.platypus import (
     SimpleDocTemplate,
     Paragraph,
@@ -14,9 +16,12 @@ from reportlab.lib.pagesizes import A4
 from model.ClickableImage import ClickableImage
 
 
+
+
 class GeneratePDFReport:
 
-    def __init__(self):
+    def __init__(self, image_model):
+        self.imageModel = image_model
 
         self.doc = SimpleDocTemplate(
             "relatorio.pdf",
@@ -48,9 +53,7 @@ class GeneratePDFReport:
     # ---------------------------------------------------
     # BUILD PDF
     # ---------------------------------------------------
-    def buildPDFSchema(self, mapa_img):
-
-
+    def buildPDFSchema(self):
         titulo_style = ParagraphStyle(
             name="TituloCustom",
             parent=self.styles["Title"],  # herda o Title
@@ -70,10 +73,11 @@ class GeneratePDFReport:
 
         self.createHeader()
 
-        mapa = Image("mapa_img.png", width=515, height=300)
+        mapa = Image(f"{self.imageModel.absolutePath}", width=515, height=250)
         self.elementos.append(mapa)
 
         self.elementos.append(Spacer(0, 0))
+        print()
 
         self.createTable()
 
@@ -89,7 +93,7 @@ class GeneratePDFReport:
     def createHeader(self):
 
         header_data = [
-            ["Created at", "Image ID", "Analyst"]
+            [f"Created at:{'2026-04-19'}", f"ImageID: {self.imageModel.fileName}", f"Analyst: {'jm-tecnologias.co.mz'}"]
         ]
 
         header_table = Table(
@@ -102,41 +106,43 @@ class GeneratePDFReport:
             ("TEXTCOLOR", (0, 0), (-1, -1), colors.white),
             ("ALIGN", (0, 0), (-1, -1), "CENTER"),
             ("FONTNAME", (0, 0), (-1, -1), "Courier-Bold"),
-            ("FONTSIZE", (0, 0), (-1, -1), 12),
+            ("FONTSIZE", (0, 0), (-1, -1), 10),
             ("BOTTOMPADDING", (0, 0), (-1, -1), 10),
         ]))
 
         self.elementos.append(header_table)
-        self.elementos.append(Spacer(1, 10))
+        self.elementos.append(Spacer(1, 5))
 
     # ---------------------------------------------------
     # MAIN TABLES
     # ---------------------------------------------------
-    def createTable(self, imgModel):
+    def createTable(self):
 
         # ---------------- Device Info ----------------
         t1 = Table([
             ["Device Information"],
-            [f"Camera: GoPro"],
-            [f"Lens: GoPro Max"],
-            [f"Software: Adobe Lightroom 7.2"]
+            [f"Camera: {self.imageModel.make}"],
+            [f"Lens: {self.imageModel.model}"],
+            [f"Software: {self.imageModel.software}"]
         ], colWidths=[295])
 
         # ---------------- Capture Metadata ----------------
         t2 = Table([
-            ["Capture Metadata"],
-            [f"Latitude: 23.2323"],
-            [f"Longitude: -53.34323"],
-            [f"Altitude: 523.232 m"]
-        ], colWidths=[210])
+            ["Image Specifications"],
+            [f"Exposure Time: {self.imageModel.ExposureTime}"],
+            [f"ShutterSpeedValue: {self.imageModel.ShutterSpeedValue}"],
+            [f"ISO Speed Ratings: {self.imageModel.ISOSpeedRatings}"],
+            [f"Focal Length: {self.imageModel.FocalLength}"],
+            [f"Focal Length In 35 mm Film: {self.imageModel.FocalLengthIn35mmFilm}"]
+        ], colWidths=[295])
 
         # ---------------- Time Info ----------------
         t3 = Table([
             ["Time Information"],
-            [f"Captured Date: AAAA/MM/DD"],
-            [f"Digitized Date: AAAA/MM/DD"],
-            [f"Offset Time: +02:00"]
-        ], colWidths=[295])
+            [f"Captured Date: {datetime.strptime(self.imageModel.DateTimeOriginal, '%Y:%m:%d %H:%M:%S').strftime('%Y-%m-%d')}"],
+            [f"Digitized Date: {datetime.strptime(self.imageModel.DateTimeDigitized, '%Y:%m:%d %H:%M:%S').strftime('%Y-%m-%d')}"],
+            [f"Offset Time: {self.imageModel.OffsetTime}"]
+        ], colWidths=[210])
 
         self.styleSection(t1)
         self.styleSection(t2)
@@ -145,8 +151,8 @@ class GeneratePDFReport:
         # layout correto (mesmo nº colunas)
         layout = Table(
             [
-                [t1, t2],
-                [t3, ""]
+                [t1, t3],
+                [t2, ""]
             ],
             colWidths=[310, 215]
         )
@@ -178,22 +184,19 @@ class GeneratePDFReport:
 
         geo_content = Table([
             ["Pin Point Position"],
-            ["Latitude: 25.3234"],
-            ["Longitude: -34.23424"],
-            ["Altitude: 523.5 m"]
+            [f"Latitude: {self.imageModel.gpsInfo.latitude}"],
+            [f"Longitude: {self.imageModel.gpsInfo.longitude}"],
+            [f"Altitude: {self.imageModel.gpsInfo.altitude}"]
         ], colWidths=[190])
 
         geo_content.setStyle(TableStyle([
             ("BACKGROUND", (0, 0), (-1, -1), colors.whitesmoke),
             ("FONTNAME", (0, 0), (-1, -1), "Courier-Bold"),
-            ("FONTSIZE", (0, 0), (-1, -1), 14),
+            ("FONTSIZE", (0, 0), (-1, -1), 12),
             ("BOTTOMPADDING", (0, 0), (-1, -1), 11),
         ]))
 
-        lat = -25.9692
-        lon = 32.5732
-
-        map_url = f"https://www.google.com/maps?q={lat},{lon}"
+        map_url = f"https://www.google.com/maps?q={self.imageModel.gpsInfo.latitude},{self.imageModel.gpsInfo.longitude}"
 
         mapa_img = ClickableImage(
             "mapa.png",
@@ -243,7 +246,8 @@ class GeneratePDFReport:
     # ---------------------------------------------------
     # PUBLIC RUN
     # ---------------------------------------------------
-    def runBuild(self, imageModel=None):
+    def runBuild(self):
 
-        self.buildPDFSchema("mapa.png")
+        self.buildPDFSchema()
+        print('Codex')
 

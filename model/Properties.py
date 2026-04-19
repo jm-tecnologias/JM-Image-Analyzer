@@ -2,8 +2,9 @@ import customtkinter as ctk
 from PIL import Image
 from PIL.ExifTags import TAGS
 
+from GeneratePDFReport import GeneratePDFReport
 from model.ImageModel import ImageModel
-
+import  os
 
 class Properties:
     def __init__(self, master):
@@ -266,7 +267,8 @@ class Properties:
             height=40,
             bg_color="#1f6aa5",
             corner_radius=0,
-            font=('Berlin Sans FB Demi', 16)
+            font=('Berlin Sans FB Demi', 16),
+            command=lambda : self.exportDadaToPDF()
         ).grid(row=0, column=0, padx=5, pady=5, sticky="we")
 
         ctk.CTkButton(
@@ -300,11 +302,26 @@ class Properties:
             font=('Berlin Sans FB Demi', 16)
         ).grid(row=1, column=1, padx=5, pady=5, sticky="we")
 
+    def exportDadaToPDF(self):
+        print(self.imageModel)
+        pdf = GeneratePDFReport(self.imageModel)
+        pdf.runBuild()
+
     def getImageData(self, path=None):
         self.metaDataSouce = {}
+        self.metaDataSouce['absolutePath'] = path
 
         img = Image.open(path)
+        if os.path.isfile(path):
+            filename = os.path.basename(path)
+            name, ext = os.path.splitext(filename)
+            # print("Ficheiro:", filename)
+            # print("Nome:", name)
+            # print("Extensão:", ext)
+            self.metaDataSouce['fileName'] = name
 
+
+        # ---------- EXIF ----------
         exifData = img._getexif()
         if exifData:
             for tag_id, value in exifData.items():
@@ -322,28 +339,28 @@ class Properties:
 
         # -------- DEVICE ----------
         self.deviceMaker.configure(text=f"Camera: {self.imageModel.make}")
-        self.deviceModel.configure(text=f"Model: {data.get('Model', 'N/A')}")
-        self.deviceSoftware.configure(text=f"{data.get('Software', 'N/A')}")
+        self.deviceModel.configure(text=f"Model: {self.imageModel.model}")
+        self.deviceSoftware.configure(text=f"{self.imageModel.software}")
         # -------- GPS ----------
         gps = data.get('GPSInfo')
 
         if gps:
-            self.gpsLatitude.configure(text=f"Latitude: {gps.get(2, 'N/A')}")
+            self.gpsLatitude.configure(text=f"Latitude: {self.imageModel.gpsInfo.latitude}")
 
-            self.gpsLongitude.configure(text=f"Longitude: {gps.get(4, 'N/A')}")
+            self.gpsLongitude.configure(text=f"Longitude: {self.imageModel.gpsInfo.longitude}")
 
-            self.gpsAltitude.configure(text=f"Altitude: {gps.get(6, 'N/A')}")
+            self.gpsAltitude.configure(text=f"Altitude: {self.imageModel.gpsInfo.altitude}")
             # ---------- Image Specifications ----------
-        self.ExposureTime.configure(text=f"Exposure Time: {data.get('ExposureTime', 'N/A')}")
-        self.ShutterSpeedValue.configure(text=f"Shutter Speed Value: {data.get('ShutterSpeedValue', 'N/A')}")
-        self.IOSSpeeddRatings.configure(text=f"IOS Speed Ratings: {data.get('ISOSpeedRatings', 'N/A')}")
-        self.FocalLength.configure(text=f"Focal Length: {data.get('FocalLength', 'N/A')}")
+        self.ExposureTime.configure(text=f"Exposure Time: {self.imageModel.ExposureTime}")
+        self.ShutterSpeedValue.configure(text=f"Shutter Speed Value: {self.imageModel.ShutterSpeedValue}")
+        self.IOSSpeeddRatings.configure(text=f"IOS Speed Ratings: {self.imageModel.ISOSpeedRatings}")
+        self.FocalLength.configure(text=f"Focal Length: {self.imageModel.FocalLength}")
         self.FocalLengthIn35mmFilm.configure(
-            text=f"Focal Length In 35mm Film: {data.get('FocalLengthIn35mmFilm', 'N/A')}")
+            text=f"Focal Length In 35mm Film: {self.imageModel.FocalLengthIn35mmFilm}")
         # ---------- Date Specifications ----------
-        self.DateTimeOriginal.configure(text=f"Date/Time Original: {data.get('DateTimeOriginal', 'N/A')}")
-        self.DateTimeDigitized.configure(text=f"Date/Time Digitized: {data.get('DateTimeDigitized', 'N/A')}")
-        self.OffsetTime.configure(text=f"OffsetTime: {data.get('OffsetTime', 'N/A')}")
+        self.DateTimeOriginal.configure(text=f"Date/Time Original: {self.imageModel.DateTimeOriginal}")
+        self.DateTimeDigitized.configure(text=f"Date/Time Digitized: {self.imageModel.DateTimeDigitized}")
+        self.OffsetTime.configure(text=f"OffsetTime: {self.imageModel.OffsetTime}")
 
         print(self.imageModel)
 
@@ -355,6 +372,9 @@ class Properties:
             "make": exif.get("Make"),
             "model": exif.get("Model"),
             "software": exif.get("Software"),
+            "absolutePath": exif.get("absolutePath"),
+            'fileName': exif.get('fileName'),
+
             "gpsInfo": gps_data,
 
             "ExposureTime": exif.get("ExposureTime", 0),

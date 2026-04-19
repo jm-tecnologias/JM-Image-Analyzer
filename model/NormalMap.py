@@ -89,9 +89,9 @@ class NormalMap:
 
         # criar novo marcador
         self.marker = self.map_widget.set_marker(lat, lon)
-        if self.marker:
-            # esperar mapa carregar
-            self.master.after(10000, self.capture_map)
+        # if self.marker:
+        #     # esperar mapa carregar
+        #     self.master.after(10000, self.capture_map)
 
     def converter_gps(self, valor, ref=None):
 
