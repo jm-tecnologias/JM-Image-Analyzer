@@ -31,3 +31,4 @@ class ImageModel(BaseModel):
     absolutePath: str
     fileName: str
 
+

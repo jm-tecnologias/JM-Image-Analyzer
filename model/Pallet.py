@@ -1,6 +1,10 @@
 
 import customtkinter as ctk
 import os
+
+from model.MineSateliteMap import MiniSateliteMap
+
+
 class Pallet:
 
     def __init__(self, master, on_folder_selected):
@@ -33,10 +37,17 @@ class Pallet:
 
         # ---------- ScrollPane for images ----------
         self.scrollPane = ctk.CTkScrollableFrame(self.palletFrame)
-        self.scrollPane.grid(row=1, column=0, sticky='nswe', pady=(26, 80), padx=20)
-
+        self.scrollPane.grid(row=1, column=0, sticky='nswe', pady=(26, 10), padx=20)
 
         self.loadImagesDir()
+
+        self.miniMap = ctk.CTkFrame(self.palletFrame)
+        self.miniMap.grid(row=2, column=0, sticky='nswe', padx=20, pady=(0, 10))
+
+        self.mini_sateliteMap = MiniSateliteMap(self.miniMap)
+
+    def getMiniMap(self):
+        return self.mini_sateliteMap
 
     def loadImagesDir(self):
 

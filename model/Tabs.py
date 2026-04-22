@@ -4,12 +4,15 @@ import customtkinter as ctk
 from PIL import Image
 
 from model.ImageView import ImageView
+from model.MineSateliteMap import MiniSateliteMap
+from model.Pallet import Pallet
 from model.SateliteMap import SateliteMap
 from model.NormalMap import NormalMap
 
 class Tabs:
     def __init__(self, master, properties=None):
 
+        self.miniMap = None
         self.properties = properties   # ⭐ ligação externa
         self.currentImage = None
 
@@ -60,12 +63,14 @@ class Tabs:
         self.tab_satelite = self.tabview.add("Satelite Map")
         self.tab_normal = self.tabview.add("Normal Map")
 
+
         # Carregar conteúdo das abas
 
         # ⭐ GUARDA A INSTÂNCIA
         self.imageView = ImageView(self.tab_carousel)
         self.sateliteMap = SateliteMap(self.tab_satelite)
         self.normalMap = NormalMap(self.tab_normal)
+
 
         return self.tabview
 
@@ -96,6 +101,12 @@ class Tabs:
                     lat, lon, lat_ref, lon_ref
                 )
 
+                if hasattr(self, "miniMap") and self.miniMap:
+                    self.miniMap.updatePosition(lat, lon, lat_ref, lon_ref)
+
+    def setMiniMap(self, mini_map):
+        self.miniMap = mini_map
+
     def getImageView(self):
         return self.imageView
 
@@ -105,53 +116,49 @@ class Tabs:
     def getNormalMap(self):
         return self.normalMap
 
-    # def botaoAcao(self):
-    #
-    #     if self.currentImage and self.properties:
-    #         self.properties.updateImageProperties(self.currentImage)
-
-
     def carouselButtonLoader(self, path):
-        # ---------- limpar dados antigos ----------
+
         self.dataSource = {}
 
+        # limpar UI antiga
         for widget in self.imageScrollPane.winfo_children():
             widget.destroy()
 
-        # ---------- guardar pasta raiz ----------
-        self.dataSource[0] = {
-            'srcPath': path,
-            'type': 'root'
-        }
+        self.image_cache = {}
 
         valid_extensions = ('.jpg', '.jpeg', '.png')
 
-        # ---------- listar imagens ----------
-        idx = 1
+        files = [
+            entry for entry in os.scandir(path)
+            if entry.is_file() and entry.name.lower().endswith(valid_extensions)
+        ]
 
-        for entry in os.scandir(path):
+        self.dataSource[0] = {'srcPath': path}
 
-            if entry.is_file() and entry.name.lower().endswith(valid_extensions):
-                # guardar no datasource
-                self.dataSource[idx] = {
-                    'file': entry.name,
-                    'absolutePath': entry.path,
-                    'type': 'image'
-                }
-                # ---------- carregar ícone ----------
-                icon = ctk.CTkImage(
-                    light_image=Image.open(entry.path),
-                    size=(180, 180)  # tamanho do ícone
-                )
+        for idx, entry in enumerate(files, start=1):
 
-                ctk.CTkButton(
-                    self.imageScrollPane,
-                    text="",
-                    image=icon,
-                    hover_color="#333",
-                    fg_color="transparent",
-                    command=lambda p=entry.path: self.onCarouselClick(p)
-                    # command=lambda p=entry.path: self.getImageView().setImage(p)
-                ).pack(side="left", padx=5)
+            self.dataSource[idx] = {
+                'file': entry.name,
+                'absolutePath': entry.path,
+            }
 
+            # -------- CACHE (evita recarregar imagem) --------
+            if entry.path in self.image_cache:
+                icon = self.image_cache[entry.path]
+            else:
+                img = Image.open(entry.path)
+                img.thumbnail((180, 180))  # mais rápido
+                icon = ctk.CTkImage(light_image=img, size=(180, 180))
+                self.image_cache[entry.path] = icon
+
+            btn = ctk.CTkButton(
+                self.imageScrollPane,
+                text="",
+                image=icon,
+                hover_color="#333",
+                fg_color="transparent",
+                command=lambda p=entry.path: self.onCarouselClick(p)
+            )
+
+            btn.pack(side="left", padx=5)
 

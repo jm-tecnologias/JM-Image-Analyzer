@@ -2,9 +2,18 @@ import customtkinter as ctk
 from PIL import Image
 from PIL.ExifTags import TAGS
 
-from GeneratePDFReport import GeneratePDFReport
+from model.GeneratePDFReport import GeneratePDFReport
 from model.ImageModel import ImageModel
-import  os
+import os
+
+import platform
+from pathlib import Path
+import tkinter as tk
+from tkinter import filedialog
+
+
+# raiz do projecto (ajusta conforme a estrutura)
+BASE_DIR = Path(__file__).resolve().parent.parent
 
 class Properties:
     def __init__(self, master):
@@ -284,12 +293,13 @@ class Properties:
         # -------- SEGUNDA LINHA --------
         ctk.CTkButton(
             buttons_frame,
-            text="Action 3",
+            text="Open Report",
             fg_color="transparent",
             height=40,
             bg_color="#1f6aa5",
             corner_radius=0,
-            font=('Berlin Sans FB Demi', 16)
+            font=('Berlin Sans FB Demi', 16),
+            command=lambda: self.selecionar_e_abrir_pdf()
         ).grid(row=1, column=0, padx=5, pady=5, sticky="we")
 
         ctk.CTkButton(
@@ -306,6 +316,29 @@ class Properties:
         print(self.imageModel)
         pdf = GeneratePDFReport(self.imageModel)
         pdf.runBuild()
+
+    def abrir_pdf(self,caminho_pdf):
+        sistema = platform.system()
+
+        if sistema == "Windows":
+            os.startfile(caminho_pdf)
+        elif sistema == "Darwin":
+            os.system(f"open '{caminho_pdf}'")
+        else:
+            os.system(f"xdg-open '{caminho_pdf}'")
+
+    def selecionar_e_abrir_pdf(self):
+        root = tk.Tk()
+        root.withdraw()
+
+        caminho = filedialog.askopenfilename(
+            title="Selecionar PDF",
+            initialdir=BASE_DIR/'assets/reports',  # 👈 pasta padrão
+            filetypes=[("Ficheiros PDF", "*.pdf")]
+        )
+
+        if caminho:
+            self.abrir_pdf(caminho)
 
     def getImageData(self, path=None):
         self.metaDataSouce = {}

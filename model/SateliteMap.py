@@ -1,7 +1,4 @@
 from tkintermapview import TkinterMapView
-import time
-from PIL import ImageGrab
-
 
 class SateliteMap:
 
@@ -30,7 +27,7 @@ class SateliteMap:
         )
 
         self.map_widget.set_position(LAT_INICIAL, LON_INICIAL)
-        self.map_widget.set_zoom(15)
+        self.map_widget.set_zoom(10)
 
         # Marcador
         # self.map_widget.set_marker(LAT_INICIAL, LON_INICIAL)
@@ -65,9 +62,6 @@ class SateliteMap:
 
         # criar novo marcador
         self.marker = self.map_widget.set_marker(lat, lon)
-        if self.marker:
-            # esperar mapa carregar
-            self.master.after(10000, self.capture_map)
 
     def converter_gps(self, valor, ref=None):
 
@@ -80,26 +74,4 @@ class SateliteMap:
 
         return decimal
 
-    def capture_map(self, file_name="mapa.png"):
 
-        # garantir atualização gráfica
-        self.master.update_idletasks()
-        self.master.update()
-
-        # posição absoluta do widget
-        x = self.map_widget.winfo_rootx()
-        y = self.map_widget.winfo_rooty()
-        w = self.map_widget.winfo_width()
-        h = self.map_widget.winfo_height()
-
-        # pequena espera extra
-        time.sleep(0.5)
-
-        # screenshot
-        image = ImageGrab.grab(bbox=(x, y, x + w, y + h))
-
-        image.save(file_name)
-
-        print("✅ Mapa capturado:", file_name)
-
-        return file_name

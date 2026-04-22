@@ -36,6 +36,8 @@ class App:
         self.tabs = Tabs(self.main_frame, self.properties)
         self.pallet = Pallet(self.main_frame, on_folder_selected=self.onFolderSelected)
 
+        self.tabs.setMiniMap(self.pallet.getMiniMap())
+
     def onFolderSelected(self, path):
         self.tabs.carouselButtonLoader(path)
 

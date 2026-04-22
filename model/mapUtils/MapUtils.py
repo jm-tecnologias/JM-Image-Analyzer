@@ -1,5 +1,7 @@
 class MapUtils:
 
+    def __init__(self):
+        self.map_widget = None
 
     def updatePosition(self, lat, lon, lat_ref=None, lon_ref=None):
 
