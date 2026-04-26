@@ -36,7 +36,7 @@ class Pallet:
         self.titleLab.grid(row=0, column=0, sticky='we', pady=(40, 10))
 
         # ---------- ScrollPane for images ----------
-        self.scrollPane = ctk.CTkScrollableFrame(self.palletFrame)
+        self.scrollPane = ctk.CTkScrollableFrame(self.palletFrame, fg_color="#141414")
         self.scrollPane.grid(row=1, column=0, sticky='nswe', pady=(26, 10), padx=20)
 
         self.loadImagesDir()
@@ -87,7 +87,7 @@ class Pallet:
 
             lab = ctk.CTkLabel(
                 self.scrollPane,
-                text=f"📁 {folder_name}",
+                text=f"📂 {folder_name}",
                 compound='left',
                 font=('Comic Sans MS', 16),
                 anchor='w'
@@ -107,7 +107,7 @@ class Pallet:
         if self.selected_item and self.selected_item.winfo_exists():
             self.selected_item.configure(fg_color="transparent")
 
-        widget.configure(fg_color="#1f6aa5")
+        widget.configure(fg_color="#44972b")
         self.selected_item = widget
 
         path = data.get('absolutePath')

@@ -1,6 +1,4 @@
 import customtkinter as ctk
-from PIL import Image
-from PIL.ExifTags import TAGS
 
 from model.GeneratePDFReport import GeneratePDFReport
 from model.ImageModel import ImageModel
@@ -17,6 +15,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 class Properties:
     def __init__(self, master):
+        # self.metaDataSouce = None
         self.master = master
         self.master.pack_propagate(False)
         self.imageModel = None
@@ -44,7 +43,7 @@ class Properties:
         self.detaisFrame.grid_columnconfigure(0, weight=1)
 
         # ---------- Details Frame ----------
-        self.detais = ctk.CTkFrame(self.detaisFrame)
+        self.detais = ctk.CTkFrame(self.detaisFrame, fg_color="#141414")
         self.detais.grid(row=1, column=0, sticky='nswe', padx=20, pady=(26, 0))
 
         self.detais.grid_columnconfigure(0, weight=1)
@@ -55,7 +54,8 @@ class Properties:
         # ---------- Device Details ----------
         ctk.CTkLabel(
             self.detais,
-            text='Device Detalis',
+            text='🎥 Device Detalis',
+            text_color="#38c20e",
             font=('Berlin Sans FB Demi', 32),
             anchor='w'
         ).grid(row=row, column=0, sticky='we', pady=(20, 10), padx=20)
@@ -104,7 +104,8 @@ class Properties:
         # ---------- GPS Details ----------
         ctk.CTkLabel(
             self.detais,
-            text='GPS Detalis',
+            text='🧭 GPS Details',
+            text_color="#38c20e",
             font=('Berlin Sans FB Demi', 32),
             anchor='w'
             # bg_color='red'
@@ -144,7 +145,8 @@ class Properties:
         # ---------- Image Specifications ----------
         ctk.CTkLabel(
             self.detais,
-            text='Image Specifications',
+            text='📸 Image Specifications',
+            text_color="#38c20e",
             font=('Berlin Sans FB Demi', 32),
             anchor='w'
         ).grid(row=row, column=0, sticky='we', pady=(20, 10), padx=20)
@@ -198,7 +200,8 @@ class Properties:
         # ---------- Date Specifications ----------
         ctk.CTkLabel(
             self.detais,
-            text='Date Specifications',
+            text='📅 Date Specifications',
+            text_color="#38c20e",
             font=('Berlin Sans FB Demi', 32),
             anchor='w'
         ).grid(row=row, column=0, sticky='we', pady=(20, 10), padx=20)
@@ -232,7 +235,8 @@ class Properties:
 
         # ---------- BUTTON FRAME DETAILS ----------
 
-        self.buttonFrameDetails = ctk.CTkFrame(self.detaisFrame)
+
+        self.buttonFrameDetails = ctk.CTkFrame(self.detaisFrame, fg_color="#141414")
         self.buttonFrameDetails.grid(
             row=2,
             column=0,
@@ -254,7 +258,7 @@ class Properties:
         # ---------- Buttons Frame ----------
         buttons_frame = ctk.CTkFrame(
             self.buttonFrameDetails,
-            fg_color="transparent"
+            fg_color="#141414"
         )
 
         buttons_frame.grid(
@@ -269,51 +273,71 @@ class Properties:
         buttons_frame.grid_columnconfigure(1, weight=1)
 
         # -------- PRIMEIRA LINHA --------
-        ctk.CTkButton(
+        export_btn = ctk.CTkButton(
             buttons_frame,
-            text="Export",
-            fg_color="transparent",
-            height=40,
-            bg_color="#1f6aa5",
-            corner_radius=0,
-            font=('Berlin Sans FB Demi', 16),
-            command=lambda : self.exportDadaToPDF()
-        ).grid(row=0, column=0, padx=5, pady=5, sticky="we")
+            text="📤 Export Report ",
+            height=44,
+            corner_radius=12,
+            fg_color="#141414",  # dark glass
+            hover_color="#1e293b",
+            border_width=1,
+            border_color="#38c20e",  # cor neon JM
+            text_color="#38c20e",
+            font=("Berlin Sans FB Demi", 16),
+            command=self.exportDadaToPDF
+        )
+
+        export_btn.grid(
+            row=0,
+            column=0,
+            padx=10,
+            pady=8,
+            sticky="we"
+        )
 
         ctk.CTkButton(
             buttons_frame,
-            text="Batch Analysis",
-            fg_color="transparent",
-            height=40,
-            bg_color="#1f6aa5",
-            corner_radius=0,
-            font=('Berlin Sans FB Demi', 16)
+            text="⚡Batch Analysis",
+            height=44,
+            corner_radius=12,
+            fg_color="#141414",  # dark glass
+            hover_color="#1e293b",
+            border_width=1,
+            border_color="#38c20e",  # cor neon JM
+            text_color="#38c20e",
+            font=("Berlin Sans FB Demi", 16),
         ).grid(row=0, column=1, padx=5, pady=5, sticky="we")
 
         # -------- SEGUNDA LINHA --------
         ctk.CTkButton(
             buttons_frame,
-            text="Open Report",
-            fg_color="transparent",
-            height=40,
-            bg_color="#1f6aa5",
-            corner_radius=0,
-            font=('Berlin Sans FB Demi', 16),
+            text="📂 Open Reports",
+            height=44,
+            corner_radius=12,
+            fg_color="#141414",  # dark glass
+            hover_color="#1e293b",
+            border_width=1,
+            border_color="#38c20e",  # cor neon JM
+            text_color="#38c20e",
+            font=("Berlin Sans FB Demi", 16),
             command=lambda: self.selecionar_e_abrir_pdf()
         ).grid(row=1, column=0, padx=5, pady=5, sticky="we")
 
         ctk.CTkButton(
             buttons_frame,
-            text="Action 4",
-            fg_color="transparent",
-            height=40,
-            bg_color="#1f6aa5",
-            corner_radius=0,
-            font=('Berlin Sans FB Demi', 16)
+            text="➕ More Actions",
+            height=44,
+            corner_radius=12,
+            fg_color="#141414",  # dark glass
+            hover_color="#1e293b",
+            border_width=1,
+            border_color="#38c20e",  # cor neon JM
+            text_color="#38c20e",
+            font=("Berlin Sans FB Demi", 16),
         ).grid(row=1, column=1, padx=5, pady=5, sticky="we")
 
     def exportDadaToPDF(self):
-        print(self.imageModel)
+        # print(self.imageModel)
         pdf = GeneratePDFReport(self.imageModel)
         pdf.runBuild()
 
@@ -340,49 +364,20 @@ class Properties:
         if caminho:
             self.abrir_pdf(caminho)
 
-    def getImageData(self, path=None):
-        self.metaDataSouce = {}
-        self.metaDataSouce['absolutePath'] = path
-
-        img = Image.open(path)
-        if os.path.isfile(path):
-            filename = os.path.basename(path)
-            name, ext = os.path.splitext(filename)
-            # print("Ficheiro:", filename)
-            # print("Nome:", name)
-            # print("Extensão:", ext)
-            self.metaDataSouce['fileName'] = name
-
-
-        # ---------- EXIF ----------
-        exifData = img._getexif()
-        if exifData:
-            for tag_id, value in exifData.items():
-                tag = TAGS.get(tag_id, tag_id)
-
-                self.metaDataSouce[tag] = value
-
-        return self.metaDataSouce
 
     def updateImageProperties(self, path):
-
-        data = self.getImageData(path)
-        self.imageModel = self.build_image_model(data)
-
+        self.imageModel = ImageModel.model_validate(ImageModel.from_image(path))
 
         # -------- DEVICE ----------
         self.deviceMaker.configure(text=f"Camera: {self.imageModel.make}")
         self.deviceModel.configure(text=f"Model: {self.imageModel.model}")
         self.deviceSoftware.configure(text=f"{self.imageModel.software}")
+
         # -------- GPS ----------
-        gps = data.get('GPSInfo')
+        self.gpsLatitude.configure(text=f"Latitude: {self.imageModel.gpsInfo.latitude}")
+        self.gpsLongitude.configure(text=f"Longitude: {self.imageModel.gpsInfo.longitude}")
+        self.gpsAltitude.configure(text=f"Altitude: {self.imageModel.gpsInfo.altitude}")
 
-        if gps:
-            self.gpsLatitude.configure(text=f"Latitude: {self.imageModel.gpsInfo.latitude}")
-
-            self.gpsLongitude.configure(text=f"Longitude: {self.imageModel.gpsInfo.longitude}")
-
-            self.gpsAltitude.configure(text=f"Altitude: {self.imageModel.gpsInfo.altitude}")
             # ---------- Image Specifications ----------
         self.ExposureTime.configure(text=f"Exposure Time: {self.imageModel.ExposureTime}")
         self.ShutterSpeedValue.configure(text=f"Shutter Speed Value: {self.imageModel.ShutterSpeedValue}")
@@ -394,72 +389,5 @@ class Properties:
         self.DateTimeOriginal.configure(text=f"Date/Time Original: {self.imageModel.DateTimeOriginal}")
         self.DateTimeDigitized.configure(text=f"Date/Time Digitized: {self.imageModel.DateTimeDigitized}")
         self.OffsetTime.configure(text=f"OffsetTime: {self.imageModel.OffsetTime}")
+        return self.imageModel
 
-        print(self.imageModel)
-
-    def build_image_model(self, exif: dict) -> ImageModel:
-
-        gps_data = parse_gps_info(exif.get("GPSInfo"))
-
-        clean_data = {
-            "make": exif.get("Make"),
-            "model": exif.get("Model"),
-            "software": exif.get("Software"),
-            "absolutePath": exif.get("absolutePath"),
-            'fileName': exif.get('fileName'),
-
-            "gpsInfo": gps_data,
-
-            "ExposureTime": exif.get("ExposureTime", 0),
-            "ShutterSpeedValue": exif.get("ShutterSpeedValue", 0),
-            "ISOSpeedRatings": exif.get("ISOSpeedRatings", 0),
-            "FocalLength": exif.get("FocalLength", 0),
-            "FocalLengthIn35mmFilm": exif.get("FocalLengthIn35mmFilm", 0),
-            "DateTimeOriginal": exif.get("DateTimeOriginal", ""),
-            "DateTimeDigitized": exif.get("DateTimeDigitized", ""),
-            "OffsetTime": exif.get("OffsetTime", ""),
-        }
-
-        return ImageModel.model_validate(clean_data)
-
-
-def converter_gps(valor, ref=None):
-    graus, minutos, segundos = valor
-
-    decimal = graus + (minutos / 60.0) + (segundos / 3600.0)
-
-    if ref in ["S", "W"]:
-        decimal = -decimal
-
-    return decimal
-
-
-def parse_gps_info(gps_raw: dict):
-    if not gps_raw:
-        return None
-
-    lat_ref = gps_raw.get(1)
-    lat = gps_raw.get(2)
-    lon_ref = gps_raw.get(3)
-    lon = gps_raw.get(4)
-
-    lat = converter_gps(lat)
-    lon = converter_gps(lon)
-
-
-    # Hemisfério
-    if lat_ref == "S":
-        lat = -abs(lat)
-
-    if lon_ref == "W":
-        lon = -abs(lon)
-
-
-    alt = gps_raw.get(6)
-    altitude = alt
-
-    return {
-        "latitude": lat,
-        "longitude": lon,
-        "altitude": altitude
-    }

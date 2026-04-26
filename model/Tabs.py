@@ -1,11 +1,8 @@
 import os
-
 import customtkinter as ctk
 from PIL import Image
-
+from model.ImageModel import ImageModel
 from model.ImageView import ImageView
-from model.MineSateliteMap import MiniSateliteMap
-from model.Pallet import Pallet
 from model.SateliteMap import SateliteMap
 from model.NormalMap import NormalMap
 
@@ -15,6 +12,8 @@ class Tabs:
         self.miniMap = None
         self.properties = properties   # ⭐ ligação externa
         self.currentImage = None
+        self.carouselButtons = []
+        self.selectedButton = None
 
 
         # Center
@@ -44,22 +43,34 @@ class Tabs:
         # ---------- ScrollPane for images carousel ----------
 
         self.imageScrollPane = ctk.CTkScrollableFrame(
-            self.metaDataDetails,
+            self.metaDataDetails, fg_color="#141414",
             orientation="horizontal"
         )
 
         self.imageScrollPane.grid(row=0, column=0, sticky="nswe")
 
-        # ctk.CTkButton(self.imageScrollPane, text="Botao de teste").pack(side="left", padx=5)
-
-
     def createTabs(self, frame):
-        self.tabview = ctk.CTkTabview(frame)
+        self.tab_font = ctk.CTkFont(
+            family="Berlin Sans FB Demi",
+            size=20,
+            # weight="bold",  # normal | bold
+            # slant="italic",  # italic
+            # underline=True,
+            # overstrike=False
+        )
+
+        self.tabview = ctk.CTkTabview(frame, fg_color="#141414",
+                                      segmented_button_selected_color="#38c20e",
+                                      # segmented_button_selected_border_color="#38c20e",
+                                      segmented_button_selected_hover_color="#38c20e"
+                                      )
         self.tabview.grid(row=1, column=0, sticky="nsew", padx=10, pady=10)
+
+        self.tabview._segmented_button.configure(font=self.tab_font)
 
 
         # Criar abas
-        self.tab_carousel = self.tabview.add("Carousel")
+        self.tab_carousel = self.tabview.add("Image Preview")
         self.tab_satelite = self.tabview.add("Satelite Map")
         self.tab_normal = self.tabview.add("Normal Map")
 
@@ -71,10 +82,25 @@ class Tabs:
         self.sateliteMap = SateliteMap(self.tab_satelite)
         self.normalMap = NormalMap(self.tab_normal)
 
-
         return self.tabview
 
-    def onCarouselClick(self, path):
+    def onCarouselClick(self, path, clicked_button):
+
+        # remover seleção anterior
+        if self.selectedButton:
+            self.selectedButton.configure(
+                border_width=0,
+                fg_color="#141414"
+            )
+
+        # aplicar seleção nova
+        clicked_button.configure(
+            border_width=2,
+            border_color="#38c20e",
+            fg_color="#020617"
+        )
+
+        self.selectedButton = clicked_button
 
         # guardar imagem actual
         self.currentImage = path
@@ -85,24 +111,14 @@ class Tabs:
         # actualizar propriedades
         if self.properties:
             self.properties.updateImageProperties(path)
-            gps = self.properties.metaDataSouce.get("GPSInfo")
 
-            if gps:
-                lat_ref = gps.get(1)
-                lat = gps.get(2)
-                lon_ref = gps.get(3)
-                lon = gps.get(4)
+            image_model = ImageModel.from_image(path)
 
-                self.getSatelliteMap().updatePosition(
-                    lat, lon, lat_ref, lon_ref
-                )
+            self.getSatelliteMap().updatePosition(image_model['GPSInfo']['Latitude'], image_model['GPSInfo']['Longitude'])
+            self.getNormalMap().updatePosition(image_model['GPSInfo']['Latitude'], image_model['GPSInfo']['Longitude'])
 
-                self.getNormalMap().updatePosition(
-                    lat, lon, lat_ref, lon_ref
-                )
-
-                if hasattr(self, "miniMap") and self.miniMap:
-                    self.miniMap.updatePosition(lat, lon, lat_ref, lon_ref)
+            if hasattr(self, "miniMap") and self.miniMap:
+                self.miniMap.updatePosition(image_model['GPSInfo']['Latitude'], image_model['GPSInfo']['Longitude'])
 
     def setMiniMap(self, mini_map):
         self.miniMap = mini_map
@@ -147,18 +163,31 @@ class Tabs:
                 icon = self.image_cache[entry.path]
             else:
                 img = Image.open(entry.path)
-                img.thumbnail((180, 180))  # mais rápido
-                icon = ctk.CTkImage(light_image=img, size=(180, 180))
+                img = img.resize((120, 120), Image.LANCZOS)  # força preenchimento total
+
+                icon = ctk.CTkImage(light_image=img, size=(120, 120))
                 self.image_cache[entry.path] = icon
 
-            btn = ctk.CTkButton(
+
+            iconBtn = ctk.CTkButton(
                 self.imageScrollPane,
                 text="",
                 image=icon,
-                hover_color="#333",
-                fg_color="transparent",
-                command=lambda p=entry.path: self.onCarouselClick(p)
+
+                width=120,
+                height=120,
+                corner_radius=14,
+                fg_color="#141414",  # dark glass
+                hover_color="#1e293b",
+                # command=lambda p=entry.path: self.onCarouselClick(p),
+
+            )
+            self.carouselButtons.append(iconBtn)
+            iconBtn.pack(side="left", padx=8, pady=6)
+
+            iconBtn.configure(
+                command=lambda p=entry.path, b=iconBtn: self.onCarouselClick(p, b)
             )
 
-            btn.pack(side="left", padx=5)
+
 

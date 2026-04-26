@@ -31,28 +31,11 @@ class SateliteMap:
 
         # Marcador
         # self.map_widget.set_marker(LAT_INICIAL, LON_INICIAL)
-        self.marker = self.map_widget.set_marker(LAT_INICIAL, LON_INICIAL)
+        self.marker = self.map_widget.set_marker(LAT_INICIAL, LON_INICIAL, marker_color_circle="#141414", marker_color_outside="#38c20e")
 
         return self.map_widget
 
-    def updatePosition(self, lat, lon, lat_ref=None, lon_ref=None):
-
-        # Converter DMS
-        if isinstance(lat, tuple):
-            lat = self.converter_gps(lat)
-
-        if isinstance(lon, tuple):
-            lon = self.converter_gps(lon)
-
-        # Hemisfério
-        if lat_ref == "S":
-            lat = -abs(lat)
-
-        if lon_ref == "W":
-            lon = -abs(lon)
-
-        print("FINAL:", lat, lon)
-
+    def updatePosition(self, lat, lon):
         # mover mapa
         self.map_widget.set_position(lat, lon)
 
@@ -63,15 +46,15 @@ class SateliteMap:
         # criar novo marcador
         self.marker = self.map_widget.set_marker(lat, lon)
 
-    def converter_gps(self, valor, ref=None):
-
-        graus, minutos, segundos = valor
-
-        decimal = graus + (minutos / 60.0) + (segundos / 3600.0)
-
-        if ref in ["S", "W"]:
-            decimal = -decimal
-
-        return decimal
+    # def converter_gps(self, valor, ref=None):
+    #
+    #     graus, minutos, segundos = valor
+    #
+    #     decimal = graus + (minutos / 60.0) + (segundos / 3600.0)
+    #
+    #     if ref in ["S", "W"]:
+    #         decimal = -decimal
+    #
+    #     return decimal
 
 
