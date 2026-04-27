@@ -374,8 +374,8 @@ class Properties:
         self.deviceSoftware.configure(text=f"{self.imageModel.software}")
 
         # -------- GPS ----------
-        self.gpsLatitude.configure(text=f"Latitude: {self.imageModel.gpsInfo.latitude}")
-        self.gpsLongitude.configure(text=f"Longitude: {self.imageModel.gpsInfo.longitude}")
+        self.gpsLatitude.configure(text=f"Latitude: {self.imageModel.gpsInfo.latitude:.4f}")
+        self.gpsLongitude.configure(text=f"Longitude: {self.imageModel.gpsInfo.longitude:.4f}")
         self.gpsAltitude.configure(text=f"Altitude: {self.imageModel.gpsInfo.altitude}")
 
             # ---------- Image Specifications ----------

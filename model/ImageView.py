@@ -1,64 +1,3 @@
-#
-# import customtkinter as ctk
-# from PIL import Image
-#
-#
-# class ImageView:
-#
-#     def __init__(self, master):
-#
-#         self.master = master
-#         self.master.pack_propagate(False)
-#
-#         self.image_label = ctk.CTkLabel(
-#             self.master,
-#             text=""
-#         )
-#         self.image_label.pack(fill='both', expand=True)
-#
-#         self.current_pil = None
-#         self.setImage('assets/logo.png')
-#
-#     # ------------------------------
-#     # SET IMAGE COM TRANSIÇÃO
-#     # ------------------------------
-#     def setImage(self, path):
-#         new_image = Image.open(path).convert("RGBA").resize((890, 850))
-#
-#         if self.current_pil is None:
-#             self.current_pil = new_image
-#             self._update_label(new_image)
-#             return
-#
-#         # converter a imagem antiga também
-#         old_image = self.current_pil.convert("RGBA")
-#
-#         self._fade_transition(old_image, new_image)
-#     # ------------------------------
-#     # ANIMAÇÃO FADE
-#     # ------------------------------
-#     def _fade_transition(self, old_img, new_img, step=0):
-#         alpha = step / 10
-#         blended = Image.blend(old_img, new_img, alpha)
-#         self._update_label(blended)
-#         if step < 10:
-#             self.master.after(30, lambda: self._fade_transition(old_img, new_img, step + 1))
-#         else:
-#             self.current_pil = new_img
-#
-#     # ------------------------------
-#     # UPDATE LABEL
-#     # ------------------------------
-#     def _update_label(self, pil_image):
-#
-#         self.my_image = ctk.CTkImage(
-#             light_image=pil_image,
-#             size=(890, 850)
-#         )
-#
-#         self.image_label.configure(image=self.my_image)
-#
-
 import customtkinter as ctk
 from PIL import Image
 
@@ -82,7 +21,7 @@ class ImageView:
         self.zoom_factor = 1
         self.zoom_step = 0.01
         self.min_zoom = 0.02
-        self.max_zoom = 5.0
+        self.max_zoom = 10.0
 
         # posição da imagem
         self.offset_x = 0
@@ -128,28 +67,6 @@ class ImageView:
                                min(self.max_zoom, self.zoom_factor))
 
         self._render_zoom()
-
-    # ------------------------------
-    # RENDER IMAGE COM ZOOM
-    # ------------------------------
-    # def _render_zoom(self):
-    #
-    #     if self.original_pil is None:
-    #         return
-    #
-    #     w, h = self.original_pil.size
-    #
-    #     new_size = (
-    #         int(w * self.zoom_factor),
-    #         int(h * self.zoom_factor)
-    #     )
-    #
-    #     self.current_pil = self.original_pil.resize(
-    #         new_size,
-    #         Image.LANCZOS
-    #     )
-    #
-    #     self._update_label(self.current_pil)
 
     def _render_zoom(self):
 

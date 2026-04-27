@@ -16,7 +16,6 @@ from model.ClickableImage import ClickableImage
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
-
 class GeneratePDFReport:
 
     def __init__(self, image_model):
@@ -39,7 +38,7 @@ class GeneratePDFReport:
         width, height = A4
         print(BASE_DIR)
         canvas.drawImage(
-            str(BASE_DIR/"assets/bg1.jpg"),
+            str(BASE_DIR / "assets/bg1.jpg"),
             0,
             0,
             width=width,
@@ -82,8 +81,6 @@ class GeneratePDFReport:
         self.elementos.append(Spacer(1, 5))
 
         self.createTable(page_width)
-
-
 
         self.doc.build(
             self.elementos,
@@ -148,8 +145,10 @@ class GeneratePDFReport:
         # ---------------- Time Info ----------------
         t3 = Table([
             ["Time Information"],
-            [f"Captured Date: {datetime.strptime(self.imageModel.DateTimeOriginal, '%Y:%m:%d %H:%M:%S').strftime('%Y-%m-%d')}"],
-            [f"Digitized Date: {datetime.strptime(self.imageModel.DateTimeDigitized, '%Y:%m:%d %H:%M:%S').strftime('%Y-%m-%d')}"],
+            [
+                f"Captured Date: {datetime.strptime(self.imageModel.DateTimeOriginal, '%Y:%m:%d %H:%M:%S').strftime('%Y-%m-%d')}"],
+            [
+                f"Digitized Date: {datetime.strptime(self.imageModel.DateTimeDigitized, '%Y:%m:%d %H:%M:%S').strftime('%Y-%m-%d')}"],
             [f"Offset Time: {self.imageModel.OffsetTime}"]
         ], colWidths=[right_col])
 
@@ -210,8 +209,8 @@ class GeneratePDFReport:
 
         geo_content = Table([
             ["Pin Point Position"],
-            [f"Latitude: {self.imageModel.gpsInfo.latitude}"],
-            [f"Longitude: {self.imageModel.gpsInfo.longitude}"],
+            [f"Latitude: {self.imageModel.gpsInfo.latitude:.4f}"],
+            [f"Longitude: {self.imageModel.gpsInfo.longitude:.4f}"],
             [f"Altitude: {self.imageModel.gpsInfo.altitude}"]
         ], colWidths=[geo_left])
 
@@ -226,7 +225,7 @@ class GeneratePDFReport:
 
         mapa_img = ClickableImage(
 
-            BASE_DIR/"assets/snap/mapa.png",
+            BASE_DIR / "assets/snap/mapa.png",
             width=geo_right,
             height=100,
             url=map_url
