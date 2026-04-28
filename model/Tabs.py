@@ -113,12 +113,14 @@ class Tabs:
             self.properties.updateImageProperties(path)
 
             image_model = ImageModel.from_image(path)
+            print(image_model)
 
-            self.getSatelliteMap().updatePosition(image_model['GPSInfo']['Latitude'], image_model['GPSInfo']['Longitude'])
-            self.getNormalMap().updatePosition(image_model['GPSInfo']['Latitude'], image_model['GPSInfo']['Longitude'])
+            if 'GPSInfo' in image_model:
+                self.getSatelliteMap().updatePosition(image_model['GPSInfo']['Latitude'], image_model['GPSInfo']['Longitude'])
+                self.getNormalMap().updatePosition(image_model['GPSInfo']['Latitude'], image_model['GPSInfo']['Longitude'])
 
-            if hasattr(self, "miniMap") and self.miniMap:
-                self.miniMap.updatePosition(image_model['GPSInfo']['Latitude'], image_model['GPSInfo']['Longitude'])
+                if hasattr(self, "miniMap") and self.miniMap:
+                    self.miniMap.updatePosition(image_model['GPSInfo']['Latitude'], image_model['GPSInfo']['Longitude'])
 
     def setMiniMap(self, mini_map):
         self.miniMap = mini_map
@@ -139,6 +141,8 @@ class Tabs:
         # limpar UI antiga
         for widget in self.imageScrollPane.winfo_children():
             widget.destroy()
+
+        self.selectedButton = None  # ⭐ IMPORTANTE
 
         self.image_cache = {}
 

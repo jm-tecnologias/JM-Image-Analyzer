@@ -24,10 +24,6 @@ class Pallet:
         # coluna única expansível
         self.palletFrame.columnconfigure(0, weight=1)
 
-        # ⭐ Header / Content /
-        # self.palletFrame.rowconfigure(0, weight=0)  # title
-        # self.palletFrame.rowconfigure(1, weight=1)  # scroll area
-
         self.palletFrame.rowconfigure(1, weight=1)
         self.palletFrame.columnconfigure(0, weight=1)
 
@@ -41,9 +37,6 @@ class Pallet:
         self.titleLab.grid(row=0, column=0, sticky='we', pady=(40, 10))
 
         # # ---------- ScrollPane for images ----------
-        # self.scrollPane = ctk.CTkScrollableFrame(self.palletFrame, fg_color="#141414")
-        # self.scrollPane.grid(row=1, column=0, sticky='nswe', pady=(26, 10), padx=20)
-
         self.tree = ttk.Treeview(self.palletFrame, show="tree")
         self.tree.grid(row=1, column=0, sticky="nsew", pady = (30, 10))
 
@@ -66,9 +59,6 @@ class Pallet:
             background=[("selected", "#38c20e")],  # fundo
             foreground=[("selected", "white")]  # texto
         )
-
-
-
         # evento seleção
         self.tree.bind("<<TreeviewSelect>>", self.on_click)
 
@@ -94,15 +84,9 @@ class Pallet:
             style="Vertical.TScrollbar",
 
         )
-        # scrollbar = ttk.Scrollbar(self.palletFrame, orient="vertical", command=self.tree.yview, style="Scrollbar")
         self.tree.configure(yscrollcommand=scrollbar.set)
-
         scrollbar.grid(row=1, column=1, sticky="nswe", pady=(30, 10))
-        # self.tree.grid(row=1, column=0, sticky="nsew")
 
-
-
-        # self.loadImagesDir()
         self.folder_walker()
 
         self.miniMap = ctk.CTkFrame(self.palletFrame)
@@ -114,7 +98,7 @@ class Pallet:
         return self.mini_sateliteMap
 
     def folder_walker(self):
-        path = r"C:\JM-Image Analyzer"
+        path = r"C:\JM-Image Analyzer\File Explore"
 
         nodes = {path: ""}
 
@@ -147,8 +131,6 @@ class Pallet:
             return
 
         path = self.tree.item(item, "values")[0]
-
-        print("Selecionado:", path)
 
         if self.on_folder_selected:
             self.on_folder_selected(path)

@@ -374,9 +374,14 @@ class Properties:
         self.deviceSoftware.configure(text=f"{self.imageModel.software}")
 
         # -------- GPS ----------
-        self.gpsLatitude.configure(text=f"Latitude: {self.imageModel.gpsInfo.latitude:.4f}")
-        self.gpsLongitude.configure(text=f"Longitude: {self.imageModel.gpsInfo.longitude:.4f}")
-        self.gpsAltitude.configure(text=f"Altitude: {self.imageModel.gpsInfo.altitude}")
+        if self.imageModel.gpsInfo is not None:
+            self.gpsLatitude.configure(text=f"Latitude: {self.imageModel.gpsInfo.latitude:.4f}" if self.imageModel.gpsInfo.latitude is not None else "Latitude: N/A")
+            self.gpsLongitude.configure(text=f"Longitude: {self.imageModel.gpsInfo.longitude:.4f}" if self.imageModel.gpsInfo.longitude is not None else "Longitude: N/A")
+            self.gpsAltitude.configure(text=f"Altitude: {self.imageModel.gpsInfo.altitude}" if self.imageModel.gpsInfo.altitude is not None else "Altitude: N/A")
+        else:
+            self.gpsLatitude.configure(text=f"Latitude: N/A")
+            self.gpsLongitude.configure(text=f"Longitude: N/A")
+            self.gpsAltitude.configure(text=f"Altitude: N/A")
 
             # ---------- Image Specifications ----------
         self.ExposureTime.configure(text=f"Exposure Time: {self.imageModel.ExposureTime}")

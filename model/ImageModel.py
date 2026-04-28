@@ -1,68 +1,9 @@
-# import os
-#
-# from PIL import Image
-# from PIL.ExifTags import TAGS
-# from pydantic import BaseModel, Field, ConfigDict
-#
-#
-# class GPSInfo(BaseModel):
-#     model_config = ConfigDict(populate_by_name=True)
-#
-#     latitude: float = Field(alias="Latitude")
-#     longitude: float = Field(alias="Longitude")
-#     altitude: float = Field(alias="Altitude")
-#
-#
-# class ImageModel(BaseModel):
-#     model_config = ConfigDict(populate_by_name=True)
-#
-#     make: str = Field(alias="Make")
-#     model: str = Field(alias="Model")
-#     software: str = Field(alias="Software")
-#
-#     gpsInfo: GPSInfo = Field(alias="GPSInfo")
-#
-#     ExposureTime: float
-#     ShutterSpeedValue: float
-#     ISOSpeedRatings: float
-#     FocalLength: float
-#     FocalLengthIn35mmFilm: float
-#     DateTimeOriginal: str
-#     DateTimeDigitized: str
-#     OffsetTime: str
-#     absolutePath: str
-#     fileName: str
-#
-#     def getData(self, path):
-#
-#         img = Image.open(path)
-#         metadata = {}
-#         gps_model = None
-#
-#         exifData = img._getexif()
-#
-#         if exifData:
-#             for tag_id, value in exifData.items():
-#                 tag = TAGS.get(tag_id, tag_id)
-#
-#                 # if tag == "GPSInfo":
-#                 #     gps_model = cls._extract_gps(value)
-#                 # else:
-#                 metadata[tag] = value
-#
-#         # cria e retorna o objeto já preenchido
-#         return metadata
-#
-#
-# img_model = ImageModel()
-# img_model = ImageModel(**dados)
-# print(img_model.getData('photo.png'))
-
 import os
 from PIL import Image
 from PIL.ExifTags import TAGS
 from pydantic import BaseModel, Field, ConfigDict
 from typing import Optional
+
 
 def converter_gps(valor, ref=None):
     graus, minutos, segundos = valor
@@ -73,6 +14,8 @@ def converter_gps(valor, ref=None):
         decimal = -decimal
 
     return decimal
+
+
 def parse_gps_info(gps_raw: dict):
     if not gps_raw:
         return None
@@ -85,14 +28,12 @@ def parse_gps_info(gps_raw: dict):
     lat = converter_gps(lat)
     lon = converter_gps(lon)
 
-
     # Hemisfério
     if lat_ref == "S":
         lat = -abs(lat)
 
     if lon_ref == "W":
         lon = -abs(lon)
-
 
     alt = gps_raw.get(6)
     altitude = alt
@@ -102,6 +43,7 @@ def parse_gps_info(gps_raw: dict):
         "longitude": lon,
         "altitude": altitude
     }
+
 
 class GPSInfo(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
@@ -161,7 +103,6 @@ class ImageModel(BaseModel):
         metadata["fileName"] = os.path.basename(path)
 
         return metadata
-
 
 # img_model = ImageModel.from_image("photo.jpg")
 #
