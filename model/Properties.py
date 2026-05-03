@@ -5,13 +5,26 @@ from model.ImageModel import ImageModel
 import os
 
 import platform
-from pathlib import Path
 import tkinter as tk
 from tkinter import filedialog
 
+from model.utils import get_base_path
 
-# raiz do projecto (ajusta conforme a estrutura)
-BASE_DIR = Path(__file__).resolve().parent.parent
+BASE_DIR = get_base_path()
+
+from pathlib import Path
+
+# Pasta Documents do utilizador
+DOCUMENTS_DIR = Path.home() / "Documents"
+
+# Pasta da aplicação
+APP_DIR = DOCUMENTS_DIR / "JM-Image-Analyzer"
+APP_DIR.mkdir(parents=True, exist_ok=True)
+
+# Subpasta File Explore
+REPORT_FILE_DIR = APP_DIR / "Report Files"
+REPORT_FILE_DIR.mkdir(parents=True, exist_ok=True)
+
 
 class Properties:
     def __init__(self, master):
@@ -357,7 +370,7 @@ class Properties:
 
         caminho = filedialog.askopenfilename(
             title="Selecionar PDF",
-            initialdir=BASE_DIR/'assets/reports',  # 👈 pasta padrão
+            initialdir=REPORT_FILE_DIR,  # 👈 pasta padrão
             filetypes=[("Ficheiros PDF", "*.pdf")]
         )
 

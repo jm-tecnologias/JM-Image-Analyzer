@@ -1,5 +1,4 @@
 from datetime import datetime
-from pathlib import Path
 from reportlab.platypus import (
     SimpleDocTemplate,
     Paragraph,
@@ -12,9 +11,22 @@ from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import A4
 from model.ClickableImage import ClickableImage
+from pathlib import Path
 
-BASE_DIR = Path(__file__).resolve().parent.parent
+from model.utils import get_base_path
 
+BASE_DIR = get_base_path()
+
+# Pasta Documents do utilizador
+DOCUMENTS_DIR = Path.home() / "Documents"
+
+# Pasta da aplicação
+APP_DIR = DOCUMENTS_DIR / "JM-Image-Analyzer"
+APP_DIR.mkdir(parents=True, exist_ok=True)
+
+# Subpasta File Explore
+SNAP_DIR = APP_DIR / "temp_snap"
+REPORT_FILE_DIR = APP_DIR / "Report Files"
 
 class GeneratePDFReport:
 
@@ -22,7 +34,7 @@ class GeneratePDFReport:
         self.imageModel = image_model
 
         self.doc = SimpleDocTemplate(
-            str(BASE_DIR / f"assets/reports/JM Report-{self.imageModel.fileName}.pdf"),
+            str(REPORT_FILE_DIR / f"JM Report-{self.imageModel.fileName}.pdf"),
             pagesize=A4
         )
 
@@ -36,7 +48,6 @@ class GeneratePDFReport:
         canvas.saveState()
 
         width, height = A4
-        print(BASE_DIR)
         canvas.drawImage(
             str(BASE_DIR / "assets/bg1.jpg"),
             0,
@@ -225,7 +236,7 @@ class GeneratePDFReport:
 
         mapa_img = ClickableImage(
 
-            BASE_DIR / "assets/snap/mapa.png",
+            SNAP_DIR / "mapa.png",
             width=geo_right,
             height=100,
             url=map_url

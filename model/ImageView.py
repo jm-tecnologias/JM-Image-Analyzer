@@ -1,6 +1,8 @@
 import customtkinter as ctk
 from PIL import Image
+from model.utils import get_base_path
 
+BASE_DIR = get_base_path()
 
 class ImageView:
 
@@ -40,7 +42,8 @@ class ImageView:
         self.image_label.bind("<ButtonPress-1>", self._start_pan)
         self.image_label.bind("<B1-Motion>", self._pan_move)
 
-        self.setImage("assets/logo.png")
+        self.setImage(BASE_DIR / "assets/logo.png")
+        # self.setImage(resource_path("assets\\logo.png"))
 
     # ------------------------------
     # SET IMAGE

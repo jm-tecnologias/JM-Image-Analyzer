@@ -9,6 +9,7 @@ from model.NormalMap import NormalMap
 class Tabs:
     def __init__(self, master, properties=None):
 
+        self.dataSource = None
         self.miniMap = None
         self.properties = properties   # ⭐ ligação externa
         self.currentImage = None
@@ -72,15 +73,12 @@ class Tabs:
         # Criar abas
         self.tab_carousel = self.tabview.add("Image Preview")
         self.tab_satelite = self.tabview.add("Satelite Map")
-        self.tab_normal = self.tabview.add("Normal Map")
-
-
-        # Carregar conteúdo das abas
+        # self.tab_normal = self.tabview.add("Normal Map")
 
         # ⭐ GUARDA A INSTÂNCIA
         self.imageView = ImageView(self.tab_carousel)
         self.sateliteMap = SateliteMap(self.tab_satelite)
-        self.normalMap = NormalMap(self.tab_normal)
+        # self.normalMap = NormalMap(self.tab_normal)
 
         return self.tabview
 
@@ -117,7 +115,7 @@ class Tabs:
 
             if 'GPSInfo' in image_model:
                 self.getSatelliteMap().updatePosition(image_model['GPSInfo']['Latitude'], image_model['GPSInfo']['Longitude'])
-                self.getNormalMap().updatePosition(image_model['GPSInfo']['Latitude'], image_model['GPSInfo']['Longitude'])
+                # self.getNormalMap().updatePosition(image_model['GPSInfo']['Latitude'], image_model['GPSInfo']['Longitude'])
 
                 if hasattr(self, "miniMap") and self.miniMap:
                     self.miniMap.updatePosition(image_model['GPSInfo']['Latitude'], image_model['GPSInfo']['Longitude'])
@@ -131,8 +129,8 @@ class Tabs:
     def getSatelliteMap(self):
         return self.sateliteMap
 
-    def getNormalMap(self):
-        return self.normalMap
+    # def getNormalMap(self):
+    #     return self.normalMap
 
     def carouselButtonLoader(self, path):
 

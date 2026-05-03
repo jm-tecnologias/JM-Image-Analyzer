@@ -1,8 +1,12 @@
+
 import customtkinter as ctk
 from model.Tabs import Tabs
 from model.Pallet import Pallet
 from model.Properties import Properties
 
+from model.utils import get_base_path
+
+BASE_DIR = get_base_path()
 
 class App:
     def __init__(self):
@@ -16,6 +20,7 @@ class App:
 
         self.root = ctk.CTk()
         self.root.title('JM-Image Analyzer')
+        self.root.iconbitmap(BASE_DIR / "assets/icon.ico")
 
         # windows size
         width = self.root.winfo_screenwidth()

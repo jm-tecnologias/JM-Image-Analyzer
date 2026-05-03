@@ -1,10 +1,22 @@
-from pathlib import Path
-BASE_DIR = Path(__file__).resolve().parent.parent
+from model.utils import get_base_path
+
+BASE_DIR = get_base_path()
 
 
 from tkintermapview import TkinterMapView
 from PIL import ImageGrab
+from pathlib import Path
 
+# Pasta Documents do utilizador
+DOCUMENTS_DIR = Path.home() / "Documents"
+
+# Pasta da aplicação
+APP_DIR = DOCUMENTS_DIR / "JM-Image-Analyzer"
+APP_DIR.mkdir(parents=True, exist_ok=True)
+
+# Subpasta File Explore
+SNAP_DIR = APP_DIR / "temp_snap"
+SNAP_DIR.mkdir(parents=True, exist_ok=True)
 
 class MiniSateliteMap:
 
@@ -100,6 +112,6 @@ class MiniSateliteMap:
         )
 
         img = ImageGrab.grab(bbox=bbox)
-        img.save(BASE_DIR/"assets/snap/mapa.png")
+        img.save(SNAP_DIR/"mapa.png")
 
         print("📸 Captura realizada:", bbox)
