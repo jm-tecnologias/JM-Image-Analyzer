@@ -28,13 +28,13 @@ APP_DIR.mkdir(parents=True, exist_ok=True)
 SNAP_DIR = APP_DIR / "temp_snap"
 REPORT_FILE_DIR = APP_DIR / "Report Files"
 
-class GeneratePDFReport:
+class GenerateMultPDFReport:
 
     def __init__(self, image_model):
         self.imageModel = image_model
 
         self.doc = SimpleDocTemplate(
-            str(REPORT_FILE_DIR / f"JM Report-{self.imageModel.fileName}.pdf"),
+            str(REPORT_FILE_DIR / f"JM Report Batch Report-{datetime.now()}.pdf"),
             pagesize=A4
         )
 

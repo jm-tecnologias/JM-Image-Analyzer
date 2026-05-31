@@ -2,10 +2,11 @@ import shutil
 
 import customtkinter as ctk
 import os
-from tkinter import ttk, Menu
-
+from tkinter import ttk, Menu, messagebox, filedialog
 from model.MineSateliteMap import MiniSateliteMap
 from model.utils import get_base_path
+import threading
+
 
 BASE_DIR = get_base_path()
 
@@ -30,7 +31,14 @@ class Pallet:
         self.on_folder_selected = on_folder_selected
 
         self.selected_item = None
-        # self.dataSource = {}
+        self.progress_label = None
+        self.progressbar = None
+        self.progress_window = None
+        self.image_extensions = {
+            ".jpg", ".jpeg", ".png",
+            ".tif", ".tiff", ".bmp",
+            ".webp", ".gif", ".raw"
+        }
         self.master = master
         self.nodes = {}
         # ________________________ Pallet Side ________________________
@@ -178,6 +186,12 @@ class Pallet:
             font=('Comic Sans MS', 12),
             command=lambda: self.delete_dir(path)
         )
+        menu.add_separator()
+        menu.add_command(
+            label="📥 Import",
+            font=('Comic Sans MS', 12),
+            command=lambda: self.start_copy(path)
+        )
 
         menu.post(event.x_root, event.y_root)
 
@@ -202,16 +216,14 @@ class Pallet:
 
     def delete_dir(self, path):
         path = Path(path)
-        parent = path.parent  # ⭐ guardar antes de apagar
+        parent = path.parent
         shutil.rmtree(path)
-
         # atualizar pasta pai
         self.refresh_node(parent)
+        messagebox.showinfo("Delete Process", "Folder Deleted!")
 
     def refresh_node(self, path):
-
         path = Path(path)
-
         node = self.nodes.get(path)
 
         if not node:
@@ -219,7 +231,6 @@ class Pallet:
 
         # remover filhos antigos
         self.tree.delete(*self.tree.get_children(node))
-
         # recriar apenas conteúdo da pasta
         for item in path.iterdir():
 
@@ -236,7 +247,6 @@ class Pallet:
             self.nodes[item] = child
 
     def on_click(self, event):
-
         item = self.tree.focus()
         if not item:
             return
@@ -245,3 +255,183 @@ class Pallet:
 
         if self.on_folder_selected:
             self.on_folder_selected(path)
+
+
+    # _______________________________ Copy Functions __________________________________________
+    def _get_all_images(self, folder):
+        images = []
+
+        for root, dirs, files in os.walk(folder):
+            for file in files:
+
+                path = Path(root) / file
+
+                if path.suffix.lower() in self.image_extensions:
+                    images.append(path)
+
+        return images
+
+    def start_copy(self, path):
+
+        destination = filedialog.askdirectory()
+
+        if not destination:
+            return
+
+        destination = Path(destination)
+
+        if not path:
+            messagebox.showwarning(
+                "Warning",
+                "Procedure not concluded!"
+            )
+            return
+
+        self.copy_item(Path(path), destination)
+
+    # ======================================================
+    # SEU CÓDIGO
+    # ======================================================
+
+    def copy_item(self, source_path, destination_dir):
+        self.progress_window = ctk.CTkToplevel(self.master)
+        self.progress_window.title("Copying...")
+        self.progress_window.geometry("400x120")
+
+        ctk.CTkLabel(
+            self.progress_window,
+            text="Copying files..."
+        ).pack(pady=10)
+
+        self.progressbar = ctk.CTkProgressBar(
+            self.progress_window,
+            width=300
+        )
+        self.progressbar.pack(pady=10)
+        self.progressbar.set(0)
+
+        self.progress_label = ctk.CTkLabel(
+            self.progress_window,
+            text="0 %"
+        )
+        self.progress_label.pack()
+
+        thread = threading.Thread(
+            target=self._copy_worker,
+            args=(source_path, destination_dir),
+            daemon=True
+        )
+        thread.start()
+
+    # -------------------------
+
+    def _copy_worker(self, source_path, destination_dir):
+        try:
+
+            source_path = Path(source_path)
+            destination_dir = Path(destination_dir)
+
+            if not source_path.is_dir():
+                raise Exception("Select a folder containing images.")
+
+            # procurar imagens
+            images = self._get_all_images(source_path)
+
+            if not images:
+                raise Exception("No images found.")
+
+            # pasta destino
+            destination = destination_dir
+
+            total_size = self._get_total_size(images)
+            copied_size = 0
+
+            for img in images:
+                # manter estrutura das subpastas
+                rel_path = img.parent.relative_to(source_path)
+
+                target_folder = destination / rel_path
+                target_folder.mkdir(parents=True, exist_ok=True)
+
+                dst_file = target_folder / img.name
+
+                copied_size += self._copy_file_with_progress(
+                    img,
+                    dst_file,
+                    total_size,
+                    copied_size
+                )
+
+            self.master.after(0, self._copy_finished, destination)
+
+        except Exception as e:
+            self.master.after(
+                0,
+                lambda: messagebox.showerror("Copy Error", str(e))
+            )
+
+    # -------------------------
+
+    def _copy_file_with_progress(
+        self,
+        src,
+        dst,
+        total_size,
+        already_copied=0
+    ):
+
+        buffer_size = 1024 * 1024
+        copied = 0
+
+        with open(src, "rb") as fsrc, open(dst, "wb") as fdst:
+
+            while True:
+                buffer = fsrc.read(buffer_size)
+                if not buffer:
+                    break
+
+                fdst.write(buffer)
+                copied += len(buffer)
+
+                progress = (already_copied + copied) / total_size
+
+                self.master.after(
+                    0,
+                    lambda p=progress: self._update_progress(p)
+                )
+
+        shutil.copystat(src, dst)
+
+        return copied
+
+    # -------------------------
+
+    def _update_progress(self, value):
+
+        self.progressbar.set(value)
+        percent = int(value * 100)
+
+        self.progress_label.configure(
+            text=f"{percent} %"
+        )
+
+    # -------------------------
+    def _get_total_size(self, images):
+
+        total = 0
+
+        for img in images:
+            total += img.stat().st_size
+
+        return total
+
+    # -------------------------
+
+    def _copy_finished(self, destination_dir):
+
+        self.progress_window.destroy()
+
+        messagebox.showinfo(
+            "Copy Process",
+            "Copy completed successfully!"
+        )

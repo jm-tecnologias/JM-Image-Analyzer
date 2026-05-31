@@ -15,6 +15,7 @@ class App:
         self.selected_item = None
         self.imageView = None
 
+
         ctk.set_appearance_mode('dark')
         ctk.set_default_color_theme('dark-blue')
 
@@ -44,6 +45,7 @@ class App:
         self.tabs.setMiniMap(self.pallet.getMiniMap())
 
     def onFolderSelected(self, path):
+        self.properties.set_path_to_bacth(path)
         self.tabs.carouselButtonLoader(path)
 
     def run(self):

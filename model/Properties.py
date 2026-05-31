@@ -1,12 +1,13 @@
 import customtkinter as ctk
 
-from model.GeneratePDFReport import GeneratePDFReport
+from model.GenerateMultPDFReport import GenerateMultPDFReport
+from model.GenerateSiglePDFReport import GeneratePDFReport
 from model.ImageModel import ImageModel
 import os
 
 import platform
 import tkinter as tk
-from tkinter import filedialog
+from tkinter import filedialog, messagebox
 
 from model.utils import get_base_path
 
@@ -32,6 +33,7 @@ class Properties:
         self.master = master
         self.master.pack_propagate(False)
         self.imageModel = None
+        self.path_to_batch = None
 
         # ______________________ Ponto de teste_______________________
         # Right
@@ -248,7 +250,6 @@ class Properties:
 
         # ---------- BUTTON FRAME DETAILS ----------
 
-
         self.buttonFrameDetails = ctk.CTkFrame(self.detaisFrame, fg_color="#141414")
         self.buttonFrameDetails.grid(
             row=2,
@@ -319,6 +320,7 @@ class Properties:
             border_color="#38c20e",  # cor neon JM
             text_color="#38c20e",
             font=("Berlin Sans FB Demi", 16),
+            command=lambda: self.bacth_analysis()
         ).grid(row=0, column=1, padx=5, pady=5, sticky="we")
 
         # -------- SEGUNDA LINHA --------
@@ -353,6 +355,8 @@ class Properties:
         # print(self.imageModel)
         pdf = GeneratePDFReport(self.imageModel)
         pdf.runBuild()
+        messagebox.showinfo("Process", "Report Created!")
+
 
     def abrir_pdf(self,caminho_pdf):
         sistema = platform.system()
@@ -377,6 +381,17 @@ class Properties:
         if caminho:
             self.abrir_pdf(caminho)
 
+    def set_path_to_bacth(self, path):
+        self.path_to_batch = path
+
+    def bacth_analysis(self):
+        path = self.path_to_batch
+        batch_array = ImageModel.batch_analysis(path)
+        print(batch_array)
+        messagebox.showinfo("Process", "Batch Gen. Concluded!")
+
+        # pdf = GenerateMultPDFReport(batch_array)
+        # pdf.runBuild()
 
     def updateImageProperties(self, path):
         self.imageModel = ImageModel.model_validate(ImageModel.from_image(path))

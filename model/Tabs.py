@@ -1,9 +1,13 @@
 import os
 import customtkinter as ctk
 from PIL import Image
+import threading
 from model.ImageModel import ImageModel
 from model.ImageView import ImageView
 from model.SateliteMap import SateliteMap
+
+import cv2
+from PIL import Image
 from model.NormalMap import NormalMap
 
 class Tabs:
@@ -15,6 +19,7 @@ class Tabs:
         self.currentImage = None
         self.carouselButtons = []
         self.selectedButton = None
+        self.image_cache = {}
 
 
         # Center
@@ -132,17 +137,86 @@ class Tabs:
     # def getNormalMap(self):
     #     return self.normalMap
 
+    def _add_button(self, path, icon):
+
+        iconBtn = ctk.CTkButton(
+            self.imageScrollPane,
+            text="",
+            image=icon,
+            width=120,
+            height=120,
+            corner_radius=14,
+            fg_color="#141414",
+            hover_color="#1e293b",
+        )
+
+        self.carouselButtons.append(iconBtn)
+
+        iconBtn.pack(side="left", padx=8, pady=6)
+
+        iconBtn.configure(
+            command=lambda p=path, b=iconBtn:
+            self.onCarouselClick(p, b)
+        )
+
+    def load_thumbnail_opencv(self, path, size=(120,120)):
+
+        # leitura ULTRA rápida
+        img = cv2.imread(path, cv2.IMREAD_UNCHANGED)
+
+        if img is None:
+            return None
+
+        # converter BGR → RGB
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+
+        # resize rápido (MUITO mais leve que PIL)
+        img = cv2.resize(
+            img,
+            size,
+            interpolation=cv2.INTER_AREA
+        )
+
+        # numpy → PIL
+        pil_image = Image.fromarray(img)
+
+        return pil_image
+
+    def _load_thumbnails_background(self, files):
+
+        for idx, entry in enumerate(files, start=1):
+
+            self.dataSource[idx] = {
+                'file': entry.name,
+                'absolutePath': entry.path,
+            }
+
+            if entry.path in self.image_cache:
+                icon = self.image_cache[entry.path]
+            else:
+                img = self.load_thumbnail_opencv(entry.path, (120, 120))
+
+                if img is None:
+                    continue
+
+                icon = ctk.CTkImage(light_image=img, size=(120, 120))
+                self.image_cache[entry.path] = icon
+
+            # atualizar UI com segurança
+            self.imageScrollPane.after(
+                0,
+                lambda p=entry.path, ic=icon: self._add_button(p, ic)
+            )
+
     def carouselButtonLoader(self, path):
 
         self.dataSource = {}
 
-        # limpar UI antiga
         for widget in self.imageScrollPane.winfo_children():
             widget.destroy()
 
-        self.selectedButton = None  # ⭐ IMPORTANTE
-
-        self.image_cache = {}
+        self.selectedButton = None
+        self.carouselButtons.clear()
 
         valid_extensions = ('.jpg', '.jpeg', '.png')
 
@@ -153,43 +227,13 @@ class Tabs:
 
         self.dataSource[0] = {'srcPath': path}
 
-        for idx, entry in enumerate(files, start=1):
+        # THREAD BACKGROUND
+        threading.Thread(
+            target=self._load_thumbnails_background,
+            args=(files,),
+            daemon=True
+        ).start()
 
-            self.dataSource[idx] = {
-                'file': entry.name,
-                'absolutePath': entry.path,
-            }
-
-            # -------- CACHE (evita recarregar imagem) --------
-            if entry.path in self.image_cache:
-                icon = self.image_cache[entry.path]
-            else:
-                img = Image.open(entry.path)
-                img = img.resize((120, 120), Image.LANCZOS)  # força preenchimento total
-
-                icon = ctk.CTkImage(light_image=img, size=(120, 120))
-                self.image_cache[entry.path] = icon
-
-
-            iconBtn = ctk.CTkButton(
-                self.imageScrollPane,
-                text="",
-                image=icon,
-
-                width=120,
-                height=120,
-                corner_radius=14,
-                fg_color="#141414",  # dark glass
-                hover_color="#1e293b",
-                # command=lambda p=entry.path: self.onCarouselClick(p),
-
-            )
-            self.carouselButtons.append(iconBtn)
-            iconBtn.pack(side="left", padx=8, pady=6)
-
-            iconBtn.configure(
-                command=lambda p=entry.path, b=iconBtn: self.onCarouselClick(p, b)
-            )
 
 
 

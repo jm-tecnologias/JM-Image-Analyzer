@@ -1,8 +1,11 @@
+
 import customtkinter as ctk
+import cv2
 from PIL import Image
 from model.utils import get_base_path
 
 BASE_DIR = get_base_path()
+
 
 class ImageView:
 
@@ -11,53 +14,64 @@ class ImageView:
         self.master = master
         self.master.pack_propagate(False)
 
-        self.image_label = ctk.CTkLabel(self.master, text="")
-        # self.image_label.pack(fill="both", expand=True)
+        self.image_label = ctk.CTkLabel(master, text="")
         self.image_label.place(relx=0.5, rely=0.5, anchor="center")
 
-        # imagem original
-        self.original_pil = None
-        self.current_pil = None
+        # -------------------------
+        # IMAGE
+        # -------------------------
+        self.original_cv = None
+        self.current_cv = None
 
-        # zoom
-        self.zoom_factor = 1
-        self.zoom_step = 0.02
+        # -------------------------
+        # ZOOM
+        # -------------------------
+        self.zoom_factor = 1.0
+        self.zoom_step = 0.1
         self.min_zoom = 0.1
-        self.max_zoom = 10.0
+        self.max_zoom = 10
 
-        # posição da imagem
+        # -------------------------
+        # POSITION
+        # -------------------------
         self.offset_x = 0
         self.offset_y = 0
 
-        # posição do rato
         self.start_x = 0
         self.start_y = 0
 
-        # eventos do rato
-        self.image_label.bind("<MouseWheel>", self._zoom)   # Windows
-        self.image_label.bind("<Button-4>", self._zoom)     # Linux scroll up
-        self.image_label.bind("<Button-5>", self._zoom)     # Linux scroll down
+        # EVENTS
+        self.image_label.bind("<MouseWheel>", self._zoom)
+        self.image_label.bind("<Button-4>", self._zoom)
+        self.image_label.bind("<Button-5>", self._zoom)
 
-        # PAN EVENTS
         self.image_label.bind("<ButtonPress-1>", self._start_pan)
         self.image_label.bind("<B1-Motion>", self._pan_move)
 
-        self.setImage(BASE_DIR / "assets/logo.png")
-        # self.setImage(resource_path("assets\\logo.png"))
+        # self.setImage(BASE_DIR / "assets/logo.png")
 
-    # ------------------------------
-    # SET IMAGE
-    # ------------------------------
+    # =====================================================
+    # LOAD IMAGE (OpenCV)
+    # =====================================================
     def setImage(self, path):
 
-        self.original_pil = Image.open(path).convert("RGBA")
-        self.zoom_factor = 0.2
+        self.original_cv = cv2.imread(str(path), cv2.IMREAD_UNCHANGED)
 
-        self._render_zoom()
+        # BGR → RGB
+        self.original_cv = cv2.cvtColor(
+            self.original_cv,
+            cv2.COLOR_BGR2RGB
+        )
 
-    # ------------------------------
+        self.zoom_factor = 0.3
+        self.offset_x = 0
+        self.offset_y = 0
+
+        self._render()
+
+    # =====================================================
     # ZOOM EVENT
-    # ------------------------------
+    # =====================================================
     def _zoom(self, event):
 
         if event.delta > 0 or event.num == 4:
@@ -65,33 +79,35 @@ class ImageView:
         else:
             self.zoom_factor -= self.zoom_step
 
-        # limitar zoom
-        self.zoom_factor = max(self.min_zoom,
-                               min(self.max_zoom, self.zoom_factor))
+        self.zoom_factor = max(
+            self.min_zoom,
+            min(self.max_zoom, self.zoom_factor)
+        )
 
-        self._render_zoom()
+        self._render()
 
-    def _render_zoom(self):
-        # self.zoom_factor =1
+    # =====================================================
+    # RENDER USING OPENCV
+    # =====================================================
+    def _render(self):
 
-        if self.original_pil is None:
+        if self.original_cv is None:
             return
 
-        w, h = self.original_pil.size
+        h, w = self.original_cv.shape[:2]
 
-        new_size = (
-            int(w * self.zoom_factor),
-            int(h * self.zoom_factor)
+        new_w = int(w * self.zoom_factor)
+        new_h = int(h * self.zoom_factor)
+
+        # OpenCV resize (FAST)
+        self.current_cv = cv2.resize(
+            self.original_cv,
+            (new_w, new_h),
+            interpolation=cv2.INTER_LANCZOS4
         )
 
-        self.current_pil = self.original_pil.resize(
-            new_size,
-            Image.LANCZOS
-        )
+        self._update_label(self.current_cv)
 
-        self._update_label(self.current_pil)
-
-        # manter posição atual
         self.image_label.place(
             relx=0.5,
             rely=0.5,
@@ -100,23 +116,30 @@ class ImageView:
             y=self.offset_y
         )
 
+    # =====================================================
+    # CONVERT CV → PIL → CTK
+    # =====================================================
+    def _update_label(self, cv_image):
 
-    # ------------------------------
-    # UPDATE LABEL
-    # ------------------------------
-    def _update_label(self, pil_image):
+        pil_img = Image.fromarray(cv_image)
 
-        self.my_image = ctk.CTkImage(
-            light_image=pil_image,
-            size=pil_image.size
+        self.tk_img = ctk.CTkImage(
+            light_image=pil_img,
+            size=pil_img.size
         )
 
-        self.image_label.configure(image=self.my_image)
+        self.image_label.configure(image=self.tk_img)
 
+    # =====================================================
+    # PAN START
+    # =====================================================
     def _start_pan(self, event):
         self.start_x = event.x_root
         self.start_y = event.y_root
 
+    # =====================================================
+    # PAN MOVE
+    # =====================================================
     def _pan_move(self, event):
 
         dx = event.x_root - self.start_x
@@ -137,10 +160,11 @@ class ImageView:
         )
 
 
-#
 # import customtkinter as ctk
 # from PIL import Image
+# from model.utils import get_base_path
 #
+# BASE_DIR = get_base_path()
 #
 # class ImageView:
 #
@@ -149,129 +173,70 @@ class ImageView:
 #         self.master = master
 #         self.master.pack_propagate(False)
 #
-#         self.image_label = ctk.CTkLabel(master, text="")
+#         self.image_label = ctk.CTkLabel(self.master, text="")
+#         # self.image_label.pack(fill="both", expand=True)
 #         self.image_label.place(relx=0.5, rely=0.5, anchor="center")
 #
-#         # -----------------------------
-#         # IMAGE
-#         # -----------------------------
+#         # imagem original
 #         self.original_pil = None
 #         self.current_pil = None
 #
-#         # -----------------------------
-#         # ZOOM SYSTEM (PRO)
-#         # -----------------------------
-#         self.zoom_factor = 1.0
-#         self.target_zoom = 1.0
-#         self.zoom_step = 1.15
+#         # zoom
+#         self.zoom_factor = 1
+#         self.zoom_step = 0.02
+#         self.min_zoom = 0.1
+#         self.max_zoom = 10.0
 #
-#         self.min_zoom = 0.05
-#         self.max_zoom = 20.0
-#
-#         self.zoom_animation_running = False
-#
-#         # -----------------------------
-#         # POSITION
-#         # -----------------------------
+#         # posição da imagem
 #         self.offset_x = 0
 #         self.offset_y = 0
 #
-#         # mouse anchor (zoom focus)
-#         self.zoom_anchor_x = 0
-#         self.zoom_anchor_y = 0
-#
-#         # pan
+#         # posição do rato
 #         self.start_x = 0
 #         self.start_y = 0
 #
-#         # -----------------------------
-#         # EVENTS
-#         # -----------------------------
-#         self.image_label.bind("<MouseWheel>", self._zoom)
-#         self.image_label.bind("<Button-4>", self._zoom)
-#         self.image_label.bind("<Button-5>", self._zoom)
+#         # eventos do rato
+#         self.image_label.bind("<MouseWheel>", self._zoom)   # Windows
+#         self.image_label.bind("<Button-4>", self._zoom)     # Linux scroll up
+#         self.image_label.bind("<Button-5>", self._zoom)     # Linux scroll down
 #
+#         # PAN EVENTS
 #         self.image_label.bind("<ButtonPress-1>", self._start_pan)
 #         self.image_label.bind("<B1-Motion>", self._pan_move)
 #
-#         self.setImage("assets/logo.png")
+#         self.setImage(BASE_DIR / "assets/logo.png")
+#         # self.setImage(resource_path("assets\\logo.png"))
 #
-#     # =====================================================
+#     # ------------------------------
 #     # SET IMAGE
-#     # =====================================================
+#     # ------------------------------
 #     def setImage(self, path):
 #
 #         self.original_pil = Image.open(path).convert("RGBA")
-#
 #         self.zoom_factor = 0.2
-#         self.target_zoom = self.zoom_factor
 #
-#         self.offset_x = 0
-#         self.offset_y = 0
+#         self._render_zoom()
 #
-#         self._render()
-#
-#     # =====================================================
-#     # ZOOM EVENT (CURSOR FOCUSED)
-#     # =====================================================
+#     # ------------------------------
+#     # ZOOM EVENT
+#     # ------------------------------
 #     def _zoom(self, event):
 #
-#         # posição do cursor RELATIVA ao widget
-#         self.zoom_anchor_x = event.x
-#         self.zoom_anchor_y = event.y
-#
-#         old_zoom = self.target_zoom
-#
 #         if event.delta > 0 or event.num == 4:
-#             self.target_zoom *= self.zoom_step
+#             self.zoom_factor += self.zoom_step
 #         else:
-#             self.target_zoom /= self.zoom_step
+#             self.zoom_factor -= self.zoom_step
 #
-#         self.target_zoom = max(
-#             self.min_zoom,
-#             min(self.max_zoom, self.target_zoom)
-#         )
+#         # limitar zoom
+#         self.zoom_factor = max(self.min_zoom,
+#                                min(self.max_zoom, self.zoom_factor))
 #
-#         # -------- MAGIC FORMULA --------
-#         scale = self.target_zoom / old_zoom
+#         self._render_zoom()
 #
-#         self.offset_x = (
-#             self.zoom_anchor_x -
-#             scale * (self.zoom_anchor_x - self.offset_x)
-#         )
+#     def _render_zoom(self):
+#         # self.zoom_factor =1
 #
-#         self.offset_y = (
-#             self.zoom_anchor_y -
-#             scale * (self.zoom_anchor_y - self.offset_y)
-#         )
-#
-#         if not self.zoom_animation_running:
-#             self._animate_zoom()
-#
-#     # =====================================================
-#     # SMOOTH ZOOM ANIMATION
-#     # =====================================================
-#     def _animate_zoom(self):
-#
-#         self.zoom_animation_running = True
-#
-#         diff = self.target_zoom - self.zoom_factor
-#         self.zoom_factor += diff * 0.18  # easing
-#
-#         self._render()
-#
-#         if abs(diff) > 0.001:
-#             self.master.after(16, self._animate_zoom)
-#         else:
-#             self.zoom_factor = self.target_zoom
-#             self.zoom_animation_running = False
-#
-#     # =====================================================
-#     # RENDER
-#     # =====================================================
-#     def _render(self):
-#
-#         if not self.original_pil:
+#         if self.original_pil is None:
 #             return
 #
 #         w, h = self.original_pil.size
@@ -288,6 +253,7 @@ class ImageView:
 #
 #         self._update_label(self.current_pil)
 #
+#         # manter posição atual
 #         self.image_label.place(
 #             relx=0.5,
 #             rely=0.5,
@@ -296,29 +262,23 @@ class ImageView:
 #             y=self.offset_y
 #         )
 #
-#     # =====================================================
-#     # UPDATE IMAGE
-#     # =====================================================
+#
+#     # ------------------------------
+#     # UPDATE LABEL
+#     # ------------------------------
 #     def _update_label(self, pil_image):
 #
-#         self.tk_image = ctk.CTkImage(
+#         self.my_image = ctk.CTkImage(
 #             light_image=pil_image,
 #             size=pil_image.size
 #         )
 #
-#         self.image_label.configure(image=self.tk_image)
+#         self.image_label.configure(image=self.my_image)
 #
-#     # =====================================================
-#     # PAN START
-#     # =====================================================
 #     def _start_pan(self, event):
-#
 #         self.start_x = event.x_root
 #         self.start_y = event.y_root
 #
-#     # =====================================================
-#     # PAN MOVE
-#     # =====================================================
 #     def _pan_move(self, event):
 #
 #         dx = event.x_root - self.start_x
@@ -337,3 +297,205 @@ class ImageView:
 #             x=self.offset_x,
 #             y=self.offset_y
 #         )
+#
+#
+# #
+# # import customtkinter as ctk
+# # from PIL import Image
+# #
+# #
+# # class ImageView:
+# #
+# #     def __init__(self, master):
+# #
+# #         self.master = master
+# #         self.master.pack_propagate(False)
+# #
+# #         self.image_label = ctk.CTkLabel(master, text="")
+# #         self.image_label.place(relx=0.5, rely=0.5, anchor="center")
+# #
+# #         # -----------------------------
+# #         # IMAGE
+# #         # -----------------------------
+# #         self.original_pil = None
+# #         self.current_pil = None
+# #
+# #         # -----------------------------
+# #         # ZOOM SYSTEM (PRO)
+# #         # -----------------------------
+# #         self.zoom_factor = 1.0
+# #         self.target_zoom = 1.0
+# #         self.zoom_step = 1.15
+# #
+# #         self.min_zoom = 0.05
+# #         self.max_zoom = 20.0
+# #
+# #         self.zoom_animation_running = False
+# #
+# #         # -----------------------------
+# #         # POSITION
+# #         # -----------------------------
+# #         self.offset_x = 0
+# #         self.offset_y = 0
+# #
+# #         # mouse anchor (zoom focus)
+# #         self.zoom_anchor_x = 0
+# #         self.zoom_anchor_y = 0
+# #
+# #         # pan
+# #         self.start_x = 0
+# #         self.start_y = 0
+# #
+# #         # -----------------------------
+# #         # EVENTS
+# #         # -----------------------------
+# #         self.image_label.bind("<MouseWheel>", self._zoom)
+# #         self.image_label.bind("<Button-4>", self._zoom)
+# #         self.image_label.bind("<Button-5>", self._zoom)
+# #
+# #         self.image_label.bind("<ButtonPress-1>", self._start_pan)
+# #         self.image_label.bind("<B1-Motion>", self._pan_move)
+# #
+# #         self.setImage("assets/logo.png")
+# #
+# #     # =====================================================
+# #     # SET IMAGE
+# #     # =====================================================
+# #     def setImage(self, path):
+# #
+# #         self.original_pil = Image.open(path).convert("RGBA")
+# #
+# #         self.zoom_factor = 0.2
+# #         self.target_zoom = self.zoom_factor
+# #
+# #         self.offset_x = 0
+# #         self.offset_y = 0
+# #
+# #         self._render()
+# #
+# #     # =====================================================
+# #     # ZOOM EVENT (CURSOR FOCUSED)
+# #     # =====================================================
+# #     def _zoom(self, event):
+# #
+# #         # posição do cursor RELATIVA ao widget
+# #         self.zoom_anchor_x = event.x
+# #         self.zoom_anchor_y = event.y
+# #
+# #         old_zoom = self.target_zoom
+# #
+# #         if event.delta > 0 or event.num == 4:
+# #             self.target_zoom *= self.zoom_step
+# #         else:
+# #             self.target_zoom /= self.zoom_step
+# #
+# #         self.target_zoom = max(
+# #             self.min_zoom,
+# #             min(self.max_zoom, self.target_zoom)
+# #         )
+# #
+# #         # -------- MAGIC FORMULA --------
+# #         scale = self.target_zoom / old_zoom
+# #
+# #         self.offset_x = (
+# #             self.zoom_anchor_x -
+# #             scale * (self.zoom_anchor_x - self.offset_x)
+# #         )
+# #
+# #         self.offset_y = (
+# #             self.zoom_anchor_y -
+# #             scale * (self.zoom_anchor_y - self.offset_y)
+# #         )
+# #
+# #         if not self.zoom_animation_running:
+# #             self._animate_zoom()
+# #
+# #     # =====================================================
+# #     # SMOOTH ZOOM ANIMATION
+# #     # =====================================================
+# #     def _animate_zoom(self):
+# #
+# #         self.zoom_animation_running = True
+# #
+# #         diff = self.target_zoom - self.zoom_factor
+# #         self.zoom_factor += diff * 0.18  # easing
+# #
+# #         self._render()
+# #
+# #         if abs(diff) > 0.001:
+# #             self.master.after(16, self._animate_zoom)
+# #         else:
+# #             self.zoom_factor = self.target_zoom
+# #             self.zoom_animation_running = False
+# #
+# #     # =====================================================
+# #     # RENDER
+# #     # =====================================================
+# #     def _render(self):
+# #
+# #         if not self.original_pil:
+# #             return
+# #
+# #         w, h = self.original_pil.size
+# #
+# #         new_size = (
+# #             int(w * self.zoom_factor),
+# #             int(h * self.zoom_factor)
+# #         )
+# #
+# #         self.current_pil = self.original_pil.resize(
+# #             new_size,
+# #             Image.LANCZOS
+# #         )
+# #
+# #         self._update_label(self.current_pil)
+# #
+# #         self.image_label.place(
+# #             relx=0.5,
+# #             rely=0.5,
+# #             anchor="center",
+# #             x=self.offset_x,
+# #             y=self.offset_y
+# #         )
+# #
+# #     # =====================================================
+# #     # UPDATE IMAGE
+# #     # =====================================================
+# #     def _update_label(self, pil_image):
+# #
+# #         self.tk_image = ctk.CTkImage(
+# #             light_image=pil_image,
+# #             size=pil_image.size
+# #         )
+# #
+# #         self.image_label.configure(image=self.tk_image)
+# #
+# #     # =====================================================
+# #     # PAN START
+# #     # =====================================================
+# #     def _start_pan(self, event):
+# #
+# #         self.start_x = event.x_root
+# #         self.start_y = event.y_root
+# #
+# #     # =====================================================
+# #     # PAN MOVE
+# #     # =====================================================
+# #     def _pan_move(self, event):
+# #
+# #         dx = event.x_root - self.start_x
+# #         dy = event.y_root - self.start_y
+# #
+# #         self.offset_x += dx
+# #         self.offset_y += dy
+# #
+# #         self.start_x = event.x_root
+# #         self.start_y = event.y_root
+# #
+# #         self.image_label.place(
+# #             relx=0.5,
+# #             rely=0.5,
+# #             anchor="center",
+# #             x=self.offset_x,
+# #             y=self.offset_y
+# #         )

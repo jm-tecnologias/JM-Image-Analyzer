@@ -1,4 +1,6 @@
 import os
+from pathlib import Path
+
 from PIL import Image
 from PIL.ExifTags import TAGS
 from pydantic import BaseModel, Field, ConfigDict
@@ -67,6 +69,8 @@ class ImageModel(BaseModel):
     ISOSpeedRatings: Optional[float] = None
     FocalLength: Optional[float] = None
     FocalLengthIn35mmFilm: Optional[float] = None
+    WhiteBalance: Optional[float] = None
+    # FocalLengthIn35mmFilm: Optional[float] = None
 
     DateTimeOriginal: Optional[str] = None
     DateTimeDigitized: Optional[str] = None
@@ -103,6 +107,20 @@ class ImageModel(BaseModel):
         metadata["fileName"] = os.path.basename(path)
 
         return metadata
+
+    @classmethod
+    def batch_analysis(self, path):
+        batch_analysis_metadata = []
+
+        for root, dirs, files in os.walk(path):
+            root = Path(root)
+            for file in files:
+                full_path = root/file
+                print(full_path)
+                batch_analysis_metadata.append(self.from_image(full_path))
+
+        return batch_analysis_metadata
+        # print(len(batch_analysis_metadata))
 
 # img_model = ImageModel.from_image("photo.jpg")
 #
