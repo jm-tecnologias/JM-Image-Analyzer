@@ -1,6 +1,5 @@
 import os
 import customtkinter as ctk
-from PIL import Image
 import threading
 from model.ImageModel import ImageModel
 from model.ImageView import ImageView
@@ -8,9 +7,6 @@ from model.SateliteMap import SateliteMap
 
 import cv2
 from PIL import Image
-from model.NormalMap import NormalMap
-# "#C9AB6A" dourado
-# "#1B2A63" azul
 class Tabs:
     def __init__(self, master, properties=None):
 

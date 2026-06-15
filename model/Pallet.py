@@ -206,25 +206,76 @@ class Pallet:
             new_dir.mkdir(exist_ok=False)
             print("Pasta criada:", new_dir)
 
-        except FileExistsError:
-            print("A pasta já existe.")
+        except FileExistsError as er:
+            messagebox.showinfo("Erro", "Error Details:"+str(er))
         self.refresh_node(path)
 
     def rename_dir(self, path):
         path = Path(path)
         dialog = ctk.CTkInputDialog(text="Enter a name", title="Rename Folder", font=('Comic Sans MS', 14))
         new_path = path.parent / dialog.get_input()
-        path.rename(new_path)
-        # atualizar pasta pai
+        try:
+            path.rename(new_path)
+        except FileExistsError as er:
+            messagebox.showerror(
+                "Erro",
+                "A folder with this name already exists"
+            )
+
+        except FileNotFoundError:
+            messagebox.showerror(
+                "Erro",
+                "The original folder was not found.."
+            )
+
+        except PermissionError:
+            messagebox.showerror(
+                "Erro",
+                "No permissions to rename this folder."
+            )
+
+        except OSError as er:
+            messagebox.showerror(
+                "Erro",
+                f"System error: {er}"
+            )
         self.refresh_node(path.parent)
 
     def delete_dir(self, path):
         path = Path(path)
         parent = path.parent
-        shutil.rmtree(path)
-        # atualizar pasta pai
+
+        try:
+            shutil.rmtree(path)
+
+        except FileNotFoundError:
+            messagebox.showerror(
+                "Erro",
+                "The folder was not found.."
+            )
+            return
+
+        except PermissionError:
+            messagebox.showerror(
+                "Erro",
+                "No permissions to delete this folder."
+            )
+            return
+
+        except OSError as er:
+            messagebox.showerror(
+                "Erro",
+                f"Error deleting folder: {er}"
+            )
+            return
+
+        # Atualizar pasta pai
         self.refresh_node(parent)
-        messagebox.showinfo("Delete Process", "Folder Deleted!")
+
+        messagebox.showinfo(
+            "Success",
+            "Folder Deleted!"
+        )
 
     def refresh_node(self, path):
         path = Path(path)

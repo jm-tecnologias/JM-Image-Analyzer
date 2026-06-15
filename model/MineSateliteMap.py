@@ -55,9 +55,6 @@ class MiniSateliteMap:
         self.marker = self.map_widget.set_marker(lat, lon, marker_color_circle="#fff",
     marker_color_outside="#1B2A63")
 
-        # 🔥 marca mapa como pronto após render inicial
-        # self.map_widget.after(1500, self._mark_map_ready)
-
     # --------------------------------------------------
 
     def _mark_map_ready(self):

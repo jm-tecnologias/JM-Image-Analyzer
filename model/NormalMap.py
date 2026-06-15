@@ -45,13 +45,3 @@ class NormalMap:
         # criar novo marcador
         self.marker = self.map_widget.set_marker(lat, lon)
 
-    # def converter_gps(self, valor, ref=None):
-    #
-    #     graus, minutos, segundos = valor
-    #
-    #     decimal = graus + (minutos / 60.0) + (segundos / 3600.0)
-    #
-    #     if ref in ["S", "W"]:
-    #         decimal = -decimal
-    #
-    #     return decimal
