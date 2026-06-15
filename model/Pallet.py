@@ -10,6 +10,8 @@ import threading
 
 BASE_DIR = get_base_path()
 
+
+
 from pathlib import Path
 
 # Pasta Documents do utilizador
@@ -43,7 +45,7 @@ class Pallet:
         self.nodes = {}
         # ________________________ Pallet Side ________________________
 
-        self.palletFrame = ctk.CTkFrame(master)
+        self.palletFrame = ctk.CTkFrame(master,fg_color="#fff")
         self.palletFrame.grid(row=0, column=0, sticky='nswe')
 
         # coluna única expansível
@@ -56,10 +58,11 @@ class Pallet:
         self.titleLab = ctk.CTkLabel(
             self.palletFrame,
             text='Media File Explore',
-            font=('Berlin Sans FB Demi', 32)
+            text_color="#1B2A63",
+            font=("Montserrat SemiBold", 32, "bold")
         )
 
-        self.titleLab.grid(row=0, column=0, sticky='we', pady=(40, 10))
+        self.titleLab.grid(row=0, column=0, sticky='we', pady=(10, 10))
 
         # # ---------- ScrollPane for images ----------
         self.tree = ttk.Treeview(self.palletFrame, show="tree")
@@ -71,10 +74,10 @@ class Pallet:
         style.theme_use("clam")
         style.configure("Treeview",
                         rowheight=32,
-                        font=("Comic Sans MS", 12),
-                        background="#141414",
-                        foreground="white",
-                        fieldbackground="#141414",  # ⭐ fundo real da área
+                        font=("Montserrat SemiBold", 14, "bold"),
+                        background="#fff",
+                        foreground="#1B2A63",
+                        fieldbackground="#fff",  # ⭐ fundo real da área
                         # foreground="white",
                         borderwidth=2,
                         bordercolor="#141414",
@@ -83,8 +86,8 @@ class Pallet:
         # ⭐ cor do item selecionado
         style.map(
             "Treeview",
-            background=[("selected", "#38c20e")],  # fundo
-            foreground=[("selected", "white")]  # texto
+            background=[("selected", "#C9AB6A")],  # fundo
+            foreground=[("selected", "#1B2A63")]  # texto
         )
         # evento seleção
         self.tree.bind("<<TreeviewSelect>>", self.on_click)
@@ -92,17 +95,17 @@ class Pallet:
         style.configure(
             "Vertical.TScrollbar",
             # gripcount=0,
-            background="#141414",
-            darkcolor="#141414",
-            lightcolor="#141414",
-            troughcolor="#38c20e",
-            bordercolor="#141414",
-            arrowcolor="#38c20e",
+            background="#fff",
+            # darkcolor="#141414",
+            lightcolor="#fff",
+            # troughcolor="#38c20e",
+            bordercolor="#fff",
+            arrowcolor="#C9AB6A",
             width=6
         )
         style.map(
             "Vertical.TScrollbar",
-            background=[("active", "#141414")]
+            background=[("active", "#fff")]
         )
         scrollbar = ttk.Scrollbar(
             self.palletFrame,
@@ -193,6 +196,7 @@ class Pallet:
             command=lambda: self.start_copy(path)
         )
 
+
         menu.post(event.x_root, event.y_root)
 
     def make_dir(self, path):
@@ -252,7 +256,6 @@ class Pallet:
             return
 
         path = self.tree.item(item, "values")[0]
-
         if self.on_folder_selected:
             self.on_folder_selected(path)
 
@@ -271,23 +274,24 @@ class Pallet:
 
         return images
 
-    def start_copy(self, path):
+    def start_copy(self, destination):
+        source = filedialog.askdirectory()
 
-        destination = filedialog.askdirectory()
-
-        if not destination:
+        if not source:
             return
 
-        destination = Path(destination)
+        source = Path(source)
 
-        if not path:
+        if not destination:
             messagebox.showwarning(
                 "Warning",
                 "Procedure not concluded!"
             )
             return
 
-        self.copy_item(Path(path), destination)
+        self.copy_item(Path(source), destination)
+        self.refresh_node(destination)
+
 
     # ======================================================
     # SEU CÓDIGO
@@ -364,10 +368,18 @@ class Pallet:
 
             self.master.after(0, self._copy_finished, destination)
 
+        # except Exception as e:
+        #     self.master.after(
+        #         0,
+        #         lambda: messagebox.showerror("Copy Error", str(e))
+        #     )
         except Exception as e:
             self.master.after(
                 0,
-                lambda: messagebox.showerror("Copy Error", str(e))
+                lambda err=str(e): messagebox.showerror(
+                    "Copy Error",
+                    err
+                )
             )
 
     # -------------------------

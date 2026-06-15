@@ -31,7 +31,8 @@ class SateliteMap:
 
         # Marcador
         # self.map_widget.set_marker(LAT_INICIAL, LON_INICIAL)
-        self.marker = self.map_widget.set_marker(LAT_INICIAL, LON_INICIAL, marker_color_circle="#141414", marker_color_outside="#38c20e")
+        self.marker = self.map_widget.set_marker(LAT_INICIAL, LON_INICIAL, marker_color_circle="#fff",
+    marker_color_outside="#1B2A63")
 
         return self.map_widget
 
@@ -44,7 +45,8 @@ class SateliteMap:
             self.marker.delete()
 
         # criar novo marcador
-        self.marker = self.map_widget.set_marker(lat, lon)
+        self.marker = self.map_widget.set_marker(lat, lon, marker_color_circle="#fff",
+    marker_color_outside="#1B2A63")
 
     # def converter_gps(self, valor, ref=None):
     #

@@ -9,7 +9,8 @@ from model.SateliteMap import SateliteMap
 import cv2
 from PIL import Image
 from model.NormalMap import NormalMap
-
+# "#C9AB6A" dourado
+# "#1B2A63" azul
 class Tabs:
     def __init__(self, master, properties=None):
 
@@ -20,10 +21,12 @@ class Tabs:
         self.carouselButtons = []
         self.selectedButton = None
         self.image_cache = {}
+        self.imageView = None
+        self.satelliteMap = None
 
 
         # Center
-        self.centerFrame = ctk.CTkFrame(master)
+        self.centerFrame = ctk.CTkFrame(master, fg_color="#fff")
         self.centerFrame.grid(row=0, column=1, sticky='nswe')
 
         self.centerFrame.columnconfigure(0, weight=1)
@@ -32,10 +35,11 @@ class Tabs:
 
         self.titleLabCenterFrame = ctk.CTkLabel(
             self.centerFrame,
-            text='Image Preview',
-            font=('Berlin Sans FB Demi', 32)
+            text='Preview',
+            text_color="#1B2A63",
+            font=("Montserrat SemiBold", 32, "bold")
         )
-        self.titleLabCenterFrame.grid(row=0, column=0, sticky='we', pady=(40, 10))
+        self.titleLabCenterFrame.grid(row=0, column=0, sticky='we', pady=(10, 10))
 
         self.createTabs(self.centerFrame)
 
@@ -46,44 +50,87 @@ class Tabs:
 
         self.metaDataDetails.columnconfigure(0, weight=1)
         self.metaDataDetails.rowconfigure(0, weight=1)
-        # ---------- ScrollPane for images carousel ----------
 
+        container = ctk.CTkFrame(
+            self.metaDataDetails,
+            fg_color="#fff"
+        )
+        container.grid(row=0, column=0, sticky="nswe")
+
+        container.grid_rowconfigure(1, weight=1)
+        container.grid_columnconfigure(0, weight=1)
+
+        # Borda superior
+        top_border = ctk.CTkFrame(
+            container,
+            height=2,
+            fg_color="#eee",
+            corner_radius=0
+        )
+
+        top_border.grid(
+            row=0,
+            column=0,
+            sticky="ew"
+        )
+
+        # Scrollable Frame
         self.imageScrollPane = ctk.CTkScrollableFrame(
-            self.metaDataDetails, fg_color="#141414",
+            container,
+            fg_color="#fff",
             orientation="horizontal"
         )
 
-        self.imageScrollPane.grid(row=0, column=0, sticky="nswe")
+        self.imageScrollPane.grid(
+            row=1,
+            column=0,
+            sticky="nswe"
+        )
 
     def createTabs(self, frame):
         self.tab_font = ctk.CTkFont(
-            family="Berlin Sans FB Demi",
-            size=20,
+            family="Montserrat SemiBold",
+            size=26,
             # weight="bold",  # normal | bold
             # slant="italic",  # italic
             # underline=True,
             # overstrike=False
         )
 
-        self.tabview = ctk.CTkTabview(frame, fg_color="#141414",
-                                      segmented_button_selected_color="#38c20e",
-                                      # segmented_button_selected_border_color="#38c20e",
-                                      segmented_button_selected_hover_color="#38c20e"
+        self.tabview = ctk.CTkTabview(frame,
+                                      width=400,
+                                      height=300,
+                                      corner_radius=10,
+                                      border_width=2,
+                                      fg_color="#fff",
+                                      border_color="#eee",
+                                      segmented_button_fg_color="#fff",
+                                      segmented_button_selected_color="#1B2A63",
+                                      segmented_button_selected_hover_color="#1B2A63",
+                                      segmented_button_unselected_color="#fff",
+                                      segmented_button_unselected_hover_color="gray70",
+                                      text_color="#C9AB6A",
+                                      text_color_disabled="yellow"
                                       )
         self.tabview.grid(row=1, column=0, sticky="nsew", padx=10, pady=10)
 
-        self.tabview._segmented_button.configure(font=self.tab_font)
+        self.tabview._segmented_button.configure(
+            font=self.tab_font,
+            # text_color="#333",  # texto das abas não selecionadas
+            # text_color_disabled="#333",
+            # selected_color="#fff"
+        )
 
 
         # Criar abas
-        self.tab_carousel = self.tabview.add("Image Preview")
-        self.tab_satelite = self.tabview.add("Satelite Map")
-        # self.tab_normal = self.tabview.add("Normal Map")
+        tab_carousel = self.tabview.add("Image Preview")
+        tab_satelite = self.tabview.add("Satelite Map")
+        # tab_normal = self.tabview.add("Normal Map")
 
         # ⭐ GUARDA A INSTÂNCIA
-        self.imageView = ImageView(self.tab_carousel)
-        self.sateliteMap = SateliteMap(self.tab_satelite)
-        # self.normalMap = NormalMap(self.tab_normal)
+        self.imageView = ImageView(tab_carousel)
+        self.satelliteMap = SateliteMap(tab_satelite)
+        # normalMap = NormalMap(tab_normal)
 
         return self.tabview
 
@@ -93,14 +140,14 @@ class Tabs:
         if self.selectedButton:
             self.selectedButton.configure(
                 border_width=0,
-                fg_color="#141414"
+                fg_color="#fff"
             )
 
         # aplicar seleção nova
         clicked_button.configure(
             border_width=2,
-            border_color="#38c20e",
-            fg_color="#020617"
+            border_color="#C9AB6A",
+            fg_color="#fff"
         )
 
         self.selectedButton = clicked_button
@@ -132,7 +179,7 @@ class Tabs:
         return self.imageView
 
     def getSatelliteMap(self):
-        return self.sateliteMap
+        return self.satelliteMap
 
     # def getNormalMap(self):
     #     return self.normalMap
@@ -146,8 +193,8 @@ class Tabs:
             width=120,
             height=120,
             corner_radius=14,
-            fg_color="#141414",
-            hover_color="#1e293b",
+            fg_color="#fff",
+            hover_color="#C9AB6A",
         )
 
         self.carouselButtons.append(iconBtn)

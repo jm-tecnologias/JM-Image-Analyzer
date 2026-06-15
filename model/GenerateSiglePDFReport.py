@@ -293,11 +293,19 @@ from reportlab.pdfgen import canvas
 from reportlab.lib import colors
 from pathlib import Path
 from datetime import datetime
+from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.ttfonts import TTFont
 
 from model.utils import get_base_path
 
 BASE_DIR = get_base_path()
 
+pdfmetrics.registerFont(
+    TTFont(
+        "Montserrat-SemiBold",
+        str(BASE_DIR / "assets/fonts/Montserrat-SemiBold.ttf")
+    )
+)
 DOCUMENTS_DIR = Path.home() / "Documents"
 APP_DIR = DOCUMENTS_DIR / "JM-Image-Analyzer"
 REPORT_FILE_DIR = APP_DIR / "Report Files"
@@ -320,16 +328,16 @@ class GeneratePDFReport:
     # ==================================================
     # COLORS (AI STYLE)
     # ==================================================
-    NEON_GREEN = colors.HexColor("#73bcd9")
-    DARK_BG = colors.HexColor("#071018")
-    CARD_BG = colors.HexColor("#0B1E26")
+    NEON_GREEN = colors.HexColor("#C9AB6A")
+    # DARK_BG = colors.HexColor("#071018")
+    CARD_BG = colors.HexColor("#1B2A63")
 
     # ==================================================
     # BACKGROUND
     # ==================================================
     def drawBackground(self):
-        self.c.setFillColor(self.DARK_BG)
-        self.c.rect(0, 0, self.W, self.H, fill=1)
+        # self.c.setFillColor(self.DARK_BG)
+        self.c.rect(0, 0, self.W, self.H)
 
     # ==================================================
     # HEADER
@@ -339,32 +347,20 @@ class GeneratePDFReport:
         c = self.c
 
         c.setFillColor(self.NEON_GREEN)
-        c.setFont("Courier-Bold", 22)
+        c.setFont("Montserrat-SemiBold", 22)
         c.drawString(60, self.H - 50, "JM Vision Intelligence System")
 
-        c.setFont("Courier-Bold", 12)
+        c.setFont("Montserrat-SemiBold", 12)
         c.drawString(60, self.H - 70, "INTELLIGENT REPORT")
 
-        # REPORT ID
-        # c.setFillColor(colors.white)
-        # c.setFont("Courier-Bold", 10)
-        # c.drawString(300, self.H - 50, "REPORT ID")
-        # c.setFillColor(colors.white)
-        # c.drawString(300, self.H - 65, f"IMG-{self.imageModel.fileName[:8]}")
-
-        # DATE
-        # c.setFillColor(colors.white)
-        # c.setFont("Courier-Bold", 10)
-        # c.drawString(420, self.H - 50, "ANALYSIS DATE")
-
         now = datetime.utcnow().strftime("%Y-%m-%d %H:%M")
-        c.setFont("Courier-Bold", 10)
-        c.setFillColor(colors.white)
+        c.setFont("Montserrat-SemiBold", 10)
+        c.setFillColor(colors.black)
         c.drawString(420, self.H - 65, now)
 
 
-        c.setFillColor(colors.white)
-        c.setFont("Courier-Bold", 12)
+        c.setFillColor(colors.black)
+        c.setFont("Montserrat-SemiBold", 12)
         c.drawString(200, self.H - 85, "Analyst.: jm-tecnologias.co.mz | Engine V1.5")
 
 
@@ -416,11 +412,11 @@ class GeneratePDFReport:
         c.roundRect(x, y, w, h, 10)
 
         c.setFillColor("#73bcd9")
-        c.setFont("Courier-Bold", 12)
+        c.setFont("Montserrat-SemiBold", 12)
         c.drawString(x + 10, y + h - 20, title)
 
         c.setFillColor(colors.white)
-        c.setFont("Courier-Bold", 9)
+        c.setFont("Montserrat-SemiBold", 9)
 
         yy = y + h - 40
 
@@ -451,7 +447,7 @@ class GeneratePDFReport:
 
         self.drawCard(
             mid, y, 180, 120,
-            "📸 DEVICE INFORMATION",
+            "DEVICE INFORMATION",
             [
                 f"Camera",
                 f"{self.imageModel.make}",
@@ -469,7 +465,7 @@ class GeneratePDFReport:
 
         self.drawCard(
             right, y, 145, 120,
-            "📅 TIME INFORMATION",
+            "TIME INFORMATION",
             [
                 f"Captured Date",
                 f"{datetime.strptime(self.imageModel.DateTimeOriginal, '%Y:%m:%d %H:%M:%S').strftime('%Y-%m-%d')}",
@@ -526,7 +522,7 @@ class GeneratePDFReport:
         c.line(40, 60, self.W - 40, 60)
 
         c.setFillColor(self.NEON_GREEN)
-        c.setFont("Helvetica", 10)
+        c.setFont("Montserrat-SemiBold", 10)
 
         c.drawCentredString(
             self.W / 2,

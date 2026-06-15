@@ -52,8 +52,8 @@ class MiniSateliteMap:
         self.map_widget.set_position(lat, lon)
         self.map_widget.set_zoom(12)
 
-        self.marker = self.map_widget.set_marker(lat, lon, marker_color_circle="#141414",
-    marker_color_outside="#38c20e")
+        self.marker = self.map_widget.set_marker(lat, lon, marker_color_circle="#fff",
+    marker_color_outside="#1B2A63")
 
         # 🔥 marca mapa como pronto após render inicial
         # self.map_widget.after(1500, self._mark_map_ready)

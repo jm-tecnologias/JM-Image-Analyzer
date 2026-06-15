@@ -48,7 +48,7 @@ class ImageView:
         self.image_label.bind("<ButtonPress-1>", self._start_pan)
         self.image_label.bind("<B1-Motion>", self._pan_move)
 
-        # self.setImage(BASE_DIR / "assets/logo.png")
+        self.setImage(BASE_DIR / "assets/indico_logo.png")
 
     # =====================================================
     # LOAD IMAGE (OpenCV)

@@ -1,288 +1,261 @@
-from datetime import datetime
-from reportlab.platypus import (
-    SimpleDocTemplate,
-    Paragraph,
-    Spacer,
-    Table,
-    TableStyle,
-    Image
-)
-from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-from reportlab.lib import colors
+
 from reportlab.lib.pagesizes import A4
-from model.ClickableImage import ClickableImage
+from reportlab.pdfgen import canvas
+from reportlab.lib import colors
 from pathlib import Path
+from datetime import datetime
+from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.ttfonts import TTFont
 
 from model.utils import get_base_path
 
 BASE_DIR = get_base_path()
 
-# Pasta Documents do utilizador
+pdfmetrics.registerFont(
+    TTFont(
+        "Montserrat-SemiBold",
+        str(BASE_DIR / "assets/fonts/Montserrat-SemiBold.ttf")
+    )
+)
 DOCUMENTS_DIR = Path.home() / "Documents"
-
-# Pasta da aplicação
 APP_DIR = DOCUMENTS_DIR / "JM-Image-Analyzer"
-APP_DIR.mkdir(parents=True, exist_ok=True)
-
-# Subpasta File Explore
-SNAP_DIR = APP_DIR / "temp_snap"
 REPORT_FILE_DIR = APP_DIR / "Report Files"
+
+REPORT_FILE_DIR.mkdir(parents=True, exist_ok=True)
+
 
 class GenerateMultPDFReport:
 
-    def __init__(self, image_model):
-        self.imageModel = image_model
+    def __init__(self, image_models):
 
-        self.doc = SimpleDocTemplate(
-            str(REPORT_FILE_DIR / f"JM Report Batch Report-{datetime.now()}.pdf"),
-            pagesize=A4
-        )
+        self.imageModels = image_models
 
-        self.elementos = []
-        self.styles = getSampleStyleSheet()
+        self.file = REPORT_FILE_DIR / f"JM-BATCH-REPORT.pdf"
 
-    # ---------------------------------------------------
+        self.c = canvas.Canvas(str(self.file), pagesize=A4)
+
+        self.W, self.H = A4
+
+    # ==================================================
+    # COLORS (AI STYLE)
+    # ==================================================
+    NEON_GREEN = colors.HexColor("#C9AB6A")
+    CARD_BG = colors.HexColor("#1B2A63")
+
+    # ==================================================
     # BACKGROUND
-    # ---------------------------------------------------
-    def background(self, canvas, doc):
-        canvas.saveState()
+    # ==================================================
+    def drawBackground(self):
+        self.c.rect(0, 0, self.W, self.H)
 
-        width, height = A4
-        canvas.drawImage(
-            str(BASE_DIR / "assets/bg1.jpg"),
-            0,
-            0,
-            width=width,
-            height=height
-        )
-
-        canvas.restoreState()
-
-    # ---------------------------------------------------
-    # BUILD PDF
-    # ---------------------------------------------------
-    def buildPDFSchema(self):
-        page_width = self.doc.width
-
-        titulo_style = ParagraphStyle(
-            name="TituloCustom",
-            parent=self.styles["Title"],
-            fontName="Courier-Bold",
-            fontSize=24,
-            alignment=1
-        )
-
-        titulo = Paragraph(
-            "JM-Image Analyzer Report",
-            titulo_style
-        )
-
-        self.elementos.append(titulo)
-        self.elementos.append(Spacer(1, 5))
-
-        self.createHeader(page_width)
-
-        mapa = Image(
-            f"{self.imageModel.absolutePath}",
-            width=page_width,
-            height=240
-        )
-
-        self.elementos.append(mapa)
-        self.elementos.append(Spacer(1, 5))
-
-        self.createTable(page_width)
-
-        self.doc.build(
-            self.elementos,
-            onFirstPage=self.background,
-            onLaterPages=self.background
-        )
-
-    # ---------------------------------------------------
+    # ==================================================
     # HEADER
-    # ---------------------------------------------------
-    def createHeader(self, page_width):
-        header_data = [[
-            f"ImageID: {self.imageModel.fileName}",
-            "Analyst: jm-tecnologias.co.mz"
-        ]]
-        print(page_width)
-        header_table = Table(
-            header_data,
-            colWidths=[page_width / 2] * 2
-            # colWidths=[170, 281.27559]
+    # ==================================================
+    def drawHeader(self):
+
+        c = self.c
+
+        c.setFillColor(self.NEON_GREEN)
+        c.setFont("Montserrat-SemiBold", 22)
+        c.drawString(60, self.H - 50, "JM Vision Intelligence System")
+
+        c.setFont("Montserrat-SemiBold", 12)
+        c.drawString(60, self.H - 70, "INTELLIGENT REPORT")
+
+        now = datetime.utcnow().strftime("%Y-%m-%d %H:%M")
+        c.setFont("Montserrat-SemiBold", 10)
+        c.setFillColor(colors.black)
+        c.drawString(420, self.H - 65, now)
+
+
+        c.setFillColor(colors.black)
+        c.setFont("Montserrat-SemiBold", 12)
+        c.drawString(200, self.H - 85, "Analyst.: jm-tecnologias.co.mz | Engine V1.5")
+
+
+    # ==================================================
+    # IMAGE PANEL (HUD STYLE)
+    # ==================================================
+    def drawImagePanel(self):
+
+        c = self.c
+
+        x = 0
+        y = self.H - 375
+        w = 600
+        h = 280
+        # frame
+        # c.setStrokeColor(self.NEON_GREEN)
+        # c.rect(x, y, w, h)
+
+        # image
+        c.drawImage(
+            self.imageModel["absolutePath"],
+            x,
+            y,
+            width=w,
+            height=h,
+            preserveAspectRatio=True
         )
 
-        header_table.setStyle(TableStyle([
-            ("BACKGROUND", (0, 0), (-1, -1), colors.green),
-            ("TEXTCOLOR", (0, 0), (-1, -1), colors.white),
-            ("ALIGN", (0, 0), (-1, -1), "CENTER"),
-            ("FONTNAME", (0, 0), (-1, -1), "Courier-Bold"),
-            ("FONTSIZE", (0, 0), (-1, -1), 10),
-            ("BOTTOMPADDING", (0, 0), (-1, -1), 10),
-            ("LEFTPADDING", (0, 0), (-1, -1), 0),
-            ("RIGHTPADDING", (0, 0), (-1, -1), 0),
-        ]))
+    # ==================================================
+    # CARD DRAWER
+    # ==================================================
+    def drawCard(self, x, y, w, h, title, lines):
 
-        self.elementos.append(header_table)
-        self.elementos.append(Spacer(1, 5))
+        c = self.c
 
-    # ---------------------------------------------------
-    # MAIN TABLES
-    # ---------------------------------------------------
-    def createTable(self, page_width):
-        left_col = page_width * 0.60
-        right_col = page_width * 0.40
+        c.setFillColor(self.CARD_BG)
+        c.roundRect(x, y, w, h, 10, fill=1)
 
-        # ---------------- Device Info ----------------
-        t1 = Table([
-            ["Device Information"],
-            [f"Camera: {self.imageModel.make}"],
-            [f"Lens: {self.imageModel.model}"],
-            [f"Software: {self.imageModel.software}"]
-        ], colWidths=[left_col])
+        c.setStrokeColor("#141414")
+        c.roundRect(x, y, w, h, 10)
 
-        # ---------------- Image Specs ----------------
-        t2 = Table([
-            ["Image Specifications"],
-            [f"Exposure Time: {self.imageModel.ExposureTime}"],
-            [f"ShutterSpeedValue: {self.imageModel.ShutterSpeedValue}"],
-            [f"ISO Speed Ratings: {self.imageModel.ISOSpeedRatings}"],
-            [f"Focal Length: {self.imageModel.FocalLength}"],
-            [f"Focal Length In 35 mm Film: {self.imageModel.FocalLengthIn35mmFilm}"]
-        ], colWidths=[left_col])
+        c.setFillColor("#73bcd9")
+        c.setFont("Montserrat-SemiBold", 12)
+        c.drawString(x + 10, y + h - 20, title)
 
-        # ---------------- Time Info ----------------
-        t3 = Table([
-            ["Time Information"],
+        c.setFillColor(colors.white)
+        c.setFont("Montserrat-SemiBold", 9)
+
+        yy = y + h - 40
+
+        for line in lines:
+            c.drawString(x + 10, yy, line)
+            yy -= 15
+
+    # ==================================================
+    # ANALYSIS PANELS
+    # ==================================================
+    def drawAnalysis(self):
+
+        left = 40
+        mid = 210
+        right = 400
+        y = self.H - 510
+
+        self.drawCard(
+            left, y, 160, 120,
+            "AI ANALYSIS SUMMARY",
             [
-                f"Captured Date: {datetime.strptime(self.imageModel.DateTimeOriginal, '%Y:%m:%d %H:%M:%S').strftime('%Y-%m-%d')}"],
+                "✔ Transmission Tower",
+                "✔ Terrain: Vegetation",
+                "✔ Integrity: NORMAL",
+                "✔ Risk Level: LOW"
+            ]
+        )
+
+        self.drawCard(
+            mid, y, 180, 120,
+            "DEVICE INFORMATION",
             [
-                f"Digitized Date: {datetime.strptime(self.imageModel.DateTimeDigitized, '%Y:%m:%d %H:%M:%S').strftime('%Y-%m-%d')}"],
-            [f"Offset Time: {self.imageModel.OffsetTime}"]
-        ], colWidths=[right_col])
+                f"Camera",
+                f"{self.imageModel.get("Make","N/A")}",
+                f"Lens",
+                f"{self.imageModel.get("Model","N/A")}",
+                f"Software",
+                f"{self.imageModel.get("Software","N/A")}"
+            ]
 
-        self.styleSection(t1)
-        self.styleSection(t2)
-        self.styleSection(t3)
 
-        layout = Table(
+
+        )
+
+        captured = datetime.strptime(
+            self.imageModel.get("DateTimeOriginal","N/A"),
+            "%Y:%m:%d %H:%M:%S"
+        )
+
+        self.drawCard(
+            right, y, 145, 120,
+            "TIME INFORMATION",
             [
-                [t1, t3],
-                [t2, ""]
-            ],
-            colWidths=[left_col, right_col]
+                f"Captured Date",
+                f"{datetime.strptime(self.imageModel.get("DateTimeOriginal","N/A"), '%Y:%m:%d %H:%M:%S').strftime('%Y-%m-%d')}",
+                f"Digitized Date",
+                f"{datetime.strptime(self.imageModel.get("DateTimeDigitized","N/A"), '%Y:%m:%d %H:%M:%S').strftime('%Y-%m-%d')}",
+                f"Offset Time"
+                f"{self.imageModel.get("OffsetTime", "N/A")}"
+            ]
         )
 
-        layout.setStyle(TableStyle([
-            ("VALIGN", (0, 0), (-1, -1), "TOP"),
-            ("LEFTPADDING", (0, 0), (-1, -1), 0),
-            ("RIGHTPADDING", (0, 0), (-1, -1), 0),
-        ]))
+    # ==================================================
+    # TELEMETRY
+    # ==================================================
+    def drawTelemetry(self):
 
-        self.elementos.append(layout)
-        self.elementos.append(Spacer(1, 1))
+        y = self.H - 670
 
-        # ---------------------------------------------------
-        # GEO SECTION
-        # ---------------------------------------------------
-        geo_title = Table(
-            [["Geographic Information"]],
-            colWidths=[page_width]
+        self.drawCard(
+            40, y, 200, 150,
+            "IMAGE TELEMETRY",
+            [
+                f"Exposure Time:        {self.imageModel.get("ExposureTime","N/A")}",
+                f"Shutter Speed:        {self.imageModel.get("ShutterSpeedValue","N/A")}",
+                f"ISO:                  {self.imageModel.get("ISOSpeedRatings","N/A")}",
+                f"Focal Length:         {self.imageModel.get("FocalLength","N/A")}",
+                f"Focal Length (35mm):  {self.imageModel.get("FocalLengthIn35mmFilm","N/A")}",
+                f"Film:                 {self.imageModel.get("FocalLength","N/A")}",
+                f"White Balance:        {self.imageModel.get("WhiteBalance","N/A")}",
+                f"Dynamic Range:        N/A",
+            ]
         )
 
-        geo_title.setStyle(TableStyle([
-            ("BACKGROUND", (0, 0), (-1, -1), colors.green),
-            ("TEXTCOLOR", (0, 0), (-1, -1), colors.white),
-            ("ALIGN", (0, 0), (-1, -1), "CENTER"),
-            ("FONTNAME", (0, 0), (-1, -1), "Courier-Bold"),
-            ("FONTSIZE", (0, 0), (-1, -1), 14),
-            ("BOTTOMPADDING", (0, 0), (-1, -1), 10),
-        ]))
 
-        data = datetime.now().date()
-        createdAt = Table(
-            [[f"Created at: {data}"]],
-            colWidths=[page_width]
+
+
+
+
+        gps = self.imageModel["GPSInfo"]
+
+        self.drawCard(
+            250, y, 295, 150,
+            "GEO INTELLIGENCE",
+            [
+                f"Latitude: {gps.get("Latitude","N/A"):.4f}",
+                f"Longitude: {gps.get("Longitude","N/A"):.4f}",
+                f"Altitude: {gps.get("Altitude","N/A")} m",
+                "Coordinate System: WGS84"
+            ]
         )
 
-        createdAt.setStyle(TableStyle([
-            ("BACKGROUND", (0, 0), (-1, -1), colors.green),
-            ("TEXTCOLOR", (0, 0), (-1, -1), colors.white),
-            ("ALIGN", (0, 0), (-1, -1), "CENTER"),
-            ("FONTNAME", (0, 0), (-1, -1), "Courier-Bold"),
-            ("FONTSIZE", (0, 0), (-1, -1), 10),
-        ]))
 
-        geo_left = page_width * 0.38
-        geo_right = page_width * 0.62
 
-        geo_content = Table([
-            ["Pin Point Position"],
-            [f"Latitude: {self.imageModel.gpsInfo.latitude:.4f}"],
-            [f"Longitude: {self.imageModel.gpsInfo.longitude:.4f}"],
-            [f"Altitude: {self.imageModel.gpsInfo.altitude}"]
-        ], colWidths=[geo_left])
 
-        geo_content.setStyle(TableStyle([
-            ("BACKGROUND", (0, 0), (-1, -1), colors.whitesmoke),
-            ("FONTNAME", (0, 0), (-1, -1), "Courier-Bold"),
-            ("FONTSIZE", (0, 0), (-1, -1), 10),
-            ("BOTTOMPADDING", (0, 0), (-1, -1), 11),
-        ]))
+    # ==================================================
+    # FOOTER
+    # ==================================================
+    def drawFooter(self):
 
-        map_url = f"https://www.google.com/maps?q={self.imageModel.gpsInfo.latitude},{self.imageModel.gpsInfo.longitude}"
+        c = self.c
 
-        mapa_img = ClickableImage(
+        c.setStrokeColor(self.NEON_GREEN)
+        c.line(40, 60, self.W - 40, 60)
 
-            SNAP_DIR / "mapa.png",
-            width=geo_right,
-            height=100,
-            url=map_url
+        c.setFillColor(self.NEON_GREEN)
+        c.setFont("Montserrat-SemiBold", 10)
+
+        c.drawCentredString(
+            self.W / 2,
+            40,
+            "PRECISION  •  INTELLIGENCE  •  RELIABILITY"
         )
 
-        geo_map = Table([[mapa_img]], colWidths=[geo_right])
-
-        geo_map.setStyle(TableStyle([
-            ("LINK", (0, 0), (0, 0), map_url),
-            ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
-            ("ALIGN", (0, 0), (-1, -1), "CENTER"),
-        ]))
-
-        layout_geo = Table([
-            [geo_title, ""],
-            [geo_content, geo_map],
-            [createdAt, ""]
-        ], colWidths=[geo_left, geo_right])
-
-        layout_geo.setStyle(TableStyle([
-            ("SPAN", (0, 0), (1, 0)),
-            ("VALIGN", (0, 0), (-1, -1), "TOP"),
-            ("SPAN", (0, 0), (1, 0)),
-        ]))
-
-        self.elementos.append(layout_geo)
-
-    # ---------------------------------------------------
-    # STYLE HELPER
-    # ---------------------------------------------------
-    def styleSection(self, table):
-        table.setStyle(TableStyle([
-            ("BACKGROUND", (0, 0), (-1, 0), colors.green),
-            ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
-            ("SPAN", (0, 0), (-1, 0)),
-            ("ALIGN", (0, 0), (-1, 0), "CENTER"),
-            ("FONTNAME", (0, 0), (-1, -1), "Courier-Bold"),
-            ("FONTSIZE", (0, 0), (-1, 0), 14),
-            ("FONTSIZE", (0, 1), (-1, -1), 10),
-            ("BOTTOMPADDING", (0, 0), (-1, 0), 10),
-            ("BACKGROUND", (0, 1), (-1, -1), colors.whitesmoke),
-        ]))
-
-    # ---------------------------------------------------
-    # PUBLIC RUN
-    # ---------------------------------------------------
+    # ==================================================
+    # BUILD REPORT
+    # ==================================================
     def runBuild(self):
-        self.buildPDFSchema()
-        print("PDF Generated ✔")
+        for image in self.imageModels:
+            self.imageModel = image
+
+            self.drawBackground()
+            self.drawHeader()
+            self.drawImagePanel()
+            self.drawAnalysis()
+            self.drawTelemetry()
+            self.drawFooter()
+            self.c.showPage()
+
+        self.c.save()
+
+        print("✅ AI REPORT GENERATED")

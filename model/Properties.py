@@ -37,7 +37,7 @@ class Properties:
 
         # ______________________ Ponto de teste_______________________
         # Right
-        self.detaisFrame = ctk.CTkFrame(master)
+        self.detaisFrame = ctk.CTkFrame(self.master, fg_color='#fff')
         self.detaisFrame.grid(row=0, column=2, sticky='nswe')
 
         # coluna única expansível
@@ -51,15 +51,16 @@ class Properties:
         # ---------- Title ----------
         ctk.CTkLabel(
             self.detaisFrame,
-            text='Selected Image Details',
-            font=('Berlin Sans FB Demi', 32)
-        ).grid(row=0, column=0, sticky='we', pady=(40, 10))
+            text='Image Details',
+            text_color="#1B2A63",
+            font=("Montserrat SemiBold", 32, "bold")
+        ).grid(row=0, column=0, sticky='we', pady=(10, 10))
 
         self.detaisFrame.grid_columnconfigure(0, weight=1)
 
         # ---------- Details Frame ----------
-        self.detais = ctk.CTkFrame(self.detaisFrame, fg_color="#141414")
-        self.detais.grid(row=1, column=0, sticky='nswe', padx=20, pady=(26, 0))
+        self.detais = ctk.CTkFrame(self.detaisFrame, fg_color="#fff", border_width=2, border_color="#eee",)
+        self.detais.grid(row=1, column=0, sticky='nswe', padx=5, pady=(26, 0))
 
         self.detais.grid_columnconfigure(0, weight=1)
         # self.detais.grid_propagate(False)
@@ -67,195 +68,247 @@ class Properties:
         row = 0
 
         # ---------- Device Details ----------
+        self.header1 = ctk.CTkFrame(self.detais, fg_color="#fff")
+        self.header1.grid(row=row, column=0, sticky='w', padx=2, pady=(5, 0))
+        self.header1.grid_columnconfigure(0, weight=1)
         ctk.CTkLabel(
-            self.detais,
-            text='🎥 Device Detalis',
-            text_color="#38c20e",
-            font=('Berlin Sans FB Demi', 32),
+            self.header1,
+            text=' 🎥 ',
+            text_color="#C9AB6A",
+            font=("Montserrat SemiBold", 32, "bold"),
+            anchor='e'
+        ).grid(row=0, column=0, pady=(10, 10))
+        ctk.CTkLabel(
+            self.header1,
+            text='Device Detalis',
+            text_color="#1B2A63",
+            font=("Montserrat SemiBold", 32, "bold"),
             anchor='w'
-        ).grid(row=row, column=0, sticky='we', pady=(20, 10), padx=20)
+        ).grid(row=0, column=1, pady=(10, 10))
         row += 1
 
         self.deviceMaker = ctk.CTkLabel(
             self.detais,
             text='Camera: N/A',
-            font=('Comic Sans MS', 14),
+            text_color="#333",
+            font=("Montserrat SemiBold", 14, "bold"),
             anchor='w'
-
         )
-        self.deviceMaker.grid(row=row, column=0, sticky='we', padx=(20, 0))
+        self.deviceMaker.grid(row=row, column=0, sticky='we', padx=(20, 5))
         row += 1
 
         self.deviceModel = ctk.CTkLabel(
             self.detais,
             text='Model: N/A',
-            font=('Comic Sans MS', 14),
+            text_color="#333",
+            font=("Montserrat SemiBold", 14, "bold"),
             anchor='w'
         )
-        self.deviceModel.grid(row=row, column=0, sticky='we', padx=(20, 0))
+        self.deviceModel.grid(row=row, column=0, sticky='we', padx=(20, 5))
         row += 1
 
         ctk.CTkLabel(
             self.detais,
             text='Software:',
-            font=('Comic Sans MS', 14),
+            text_color="#333",
+            font=("Montserrat SemiBold", 14, "bold"),
             anchor='w'
             # wraplength=353,
             # bg_color='red'
-        ).grid(row=row, column=0, sticky='we', padx=(20, 0))
+        ).grid(row=row, column=0, sticky='we', padx=(20, 5))
         row += 1
 
         self.deviceSoftware = ctk.CTkLabel(
             self.detais,
             text='N/A',
-            font=('Comic Sans MS', 14),
+            text_color="#333",
+            font=("Montserrat SemiBold", 14, "bold"),
             anchor='w'
             # wraplength=353,
             # bg_color='red'
         )
-        self.deviceSoftware.grid(row=row, column=0, sticky='we', padx=(20, 0))
+        self.deviceSoftware.grid(row=row, column=0, sticky='we', padx=(20, 5))
         row += 1
 
+        self.header2 = ctk.CTkFrame(self.detais, fg_color="#fff")
+        self.header2.grid(row=row, column=0, sticky='w', padx=2, pady=(5, 0))
+        self.header2.grid_columnconfigure(0, weight=1)
         # ---------- GPS Details ----------
+        row += 1
         ctk.CTkLabel(
-            self.detais,
-            text='🧭 GPS Details',
-            text_color="#38c20e",
-            font=('Berlin Sans FB Demi', 32),
-            anchor='w'
-            # bg_color='red'
-        ).grid(row=row, column=0, sticky='we', pady=(20, 10), padx=20)
+            self.header2,
+            text=' 🧭 ',
+            text_color="#C9AB6A",
+            font=("Montserrat SemiBold", 32, "bold"),
+        ).grid(row=0, column=0, pady=(10, 10))
+        ctk.CTkLabel(
+            self.header2,
+            text='GPS Details',
+            text_color="#1B2A63",
+            font=("Montserrat SemiBold", 32, "bold"),
+        ).grid(row=0, column=1, pady=(10, 10))
         row += 1
 
         self.gpsLatitude = ctk.CTkLabel(
             self.detais,
             text='Latitude: N/A',
-            font=('Comic Sans MS', 14),
+            text_color="#333",
+            font=("Montserrat SemiBold", 14, "bold"),
             anchor='w'
             # bg_color='red'
         )
-        self.gpsLatitude.grid(row=row, column=0, sticky='we', padx=(20, 0))
+        self.gpsLatitude.grid(row=row, column=0, sticky='we', padx=(20, 5))
         row += 1
 
         self.gpsLongitude = ctk.CTkLabel(
             self.detais,
             text='Longitude: N/A',
-            font=('Comic Sans MS', 14),
+            text_color="#333",
+            font=("Montserrat SemiBold", 14, "bold"),
             anchor='w'
             # bg_color='red'
         )
-        self.gpsLongitude.grid(row=row, column=0, sticky='we', padx=(20, 0))
+        self.gpsLongitude.grid(row=row, column=0, sticky='we', padx=(20, 5))
         row += 1
 
         self.gpsAltitude = ctk.CTkLabel(
             self.detais,
             text='Altitude: N/A',
-            font=('Comic Sans MS', 14),
+            text_color="#333",
+            font=("Montserrat SemiBold", 14, "bold"),
             anchor='w'
             # bg_color='red'
         )
-        self.gpsAltitude.grid(row=row, column=0, sticky='we', padx=(20, 0))
+        self.gpsAltitude.grid(row=row, column=0, sticky='we', padx=(20, 5))
         row += 1
 
         # ---------- Image Specifications ----------
+        self.header3 = ctk.CTkFrame(self.detais, fg_color="#fff")
+        self.header3.grid(row=row, column=0, sticky='w', padx=2, pady=(5, 0))
+        self.header3.grid_columnconfigure(0, weight=1)
         ctk.CTkLabel(
-            self.detais,
-            text='📸 Image Specifications',
-            text_color="#38c20e",
-            font=('Berlin Sans FB Demi', 32),
+            self.header3,
+            text=' 📸 ',
+            text_color="#C9AB6A",
+            font=("Montserrat SemiBold", 32, "bold"),
             anchor='w'
-        ).grid(row=row, column=0, sticky='we', pady=(20, 10), padx=20)
+        ).grid(row=0, column=0, pady=(10, 10))
+        ctk.CTkLabel(
+            self.header3,
+            text='Image Specifications',
+            text_color="#1B2A63",
+            font=("Montserrat SemiBold", 32, "bold"),
+            anchor='w'
+        ).grid(row=0, column=1, pady=(10, 10))
         row += 1
 
         self.ExposureTime = ctk.CTkLabel(
             self.detais,
             text='Exposure Time: N/A',
-            font=('Comic Sans MS', 14),
+            text_color="#333",
+            font=("Montserrat SemiBold", 14, "bold"),
             anchor='w'
         )
-        self.ExposureTime.grid(row=row, column=0, sticky='we', padx=20)
+        self.ExposureTime.grid(row=row, column=0, sticky='we', padx=(20,5))
         row += 1
 
         self.ShutterSpeedValue = ctk.CTkLabel(
             self.detais,
             text='Shutter Speed Value: N/A',
-            font=('Comic Sans MS', 14),
+            text_color="#333",
+            font=("Montserrat SemiBold", 14, "bold"),
             anchor='w'
         )
-        self.ShutterSpeedValue.grid(row=row, column=0, sticky='we', padx=20)
+        self.ShutterSpeedValue.grid(row=row, column=0, sticky='we', padx=(20,5))
         row += 1
 
         self.IOSSpeeddRatings = ctk.CTkLabel(
             self.detais,
             text='IOS Speedd Ratings: N/A',
-            font=('Comic Sans MS', 14),
+            text_color="#333",
+            font=("Montserrat SemiBold", 14, "bold"),
             anchor='w'
         )
-        self.IOSSpeeddRatings.grid(row=row, column=0, sticky='we', padx=20)
+        self.IOSSpeeddRatings.grid(row=row, column=0, sticky='we', padx=(20,5))
         row += 1
 
         self.FocalLength = ctk.CTkLabel(
             self.detais,
-            text='Focal Length: 523,45',
-            font=('Comic Sans MS', 14),
+            text='Focal Length: N/A',
+            text_color="#333",
+            font=("Montserrat SemiBold", 14, "bold"),
             anchor='w'
         )
-        self.FocalLength.grid(row=row, column=0, sticky='we', padx=20)
+        self.FocalLength.grid(row=row, column=0, sticky='we', padx=(20,5))
         row += 1
 
         self.FocalLengthIn35mmFilm = ctk.CTkLabel(
             self.detais,
             text='Focal LengthIn 35mm Film: N/A',
-            font=('Comic Sans MS', 14),
+            text_color="#333",
+            font=("Montserrat SemiBold", 14, "bold"),
             anchor='w'
         )
-        self.FocalLengthIn35mmFilm.grid(row=row, column=0, sticky='we', padx=20)
+        self.FocalLengthIn35mmFilm.grid(row=row, column=0, sticky='we', padx=(20,5))
         row += 1
 
         # ---------- Date Specifications ----------
+        self.header4 = ctk.CTkFrame(self.detais, fg_color="#fff")
+        self.header4.grid(row=row, column=0, sticky='w', padx=2, pady=(5, 0))
+        self.header4.grid_columnconfigure(0, weight=1)
         ctk.CTkLabel(
-            self.detais,
-            text='📅 Date Specifications',
-            text_color="#38c20e",
-            font=('Berlin Sans FB Demi', 32),
+            self.header4,
+            text=' 📅 ',
+            text_color="#C9AB6A",
+            font=("Montserrat SemiBold", 32, "bold"),
             anchor='w'
-        ).grid(row=row, column=0, sticky='we', pady=(20, 10), padx=20)
+        ).grid(row=0, column=0, pady=(10, 10))
+        ctk.CTkLabel(
+            self.header4,
+            text='Date Specifications',
+            text_color="#1B2A63",
+            font=("Montserrat SemiBold", 32, "bold"),
+            anchor='w'
+        ).grid(row=0, column=1, pady=(10, 10))
         row += 1
 
         self.DateTimeOriginal = ctk.CTkLabel(
             self.detais,
             text='Date&Time Original: N/A',
-            font=('Comic Sans MS', 14),
+            text_color="#333",
+            font=("Montserrat SemiBold", 14, "bold"),
             anchor='w'
         )
-        self.DateTimeOriginal.grid(row=row, column=0, sticky='we', padx=20)
+        self.DateTimeOriginal.grid(row=row, column=0, sticky='we', padx=(20,5))
         row += 1
 
         self.DateTimeDigitized = ctk.CTkLabel(
             self.detais,
             text='DateTimeDigitized: N/A',
-            font=('Comic Sans MS', 14),
+            text_color="#333",
+            font=("Montserrat SemiBold", 14, "bold"),
             anchor='w'
         )
-        self.DateTimeDigitized.grid(row=row, column=0, sticky='we', padx=20)
+        self.DateTimeDigitized.grid(row=row, column=0, sticky='we', padx=(20,5))
         row += 1
 
         self.OffsetTime = ctk.CTkLabel(
             self.detais,
             text='OffsetTime: N/A',
-            font=('Comic Sans MS', 14),
+            text_color="#333",
+            font=("Montserrat SemiBold", 14, "bold"),
             anchor='w'
         )
-        self.OffsetTime.grid(row=row, column=0, sticky='we', padx=20)
+        self.OffsetTime.grid(row=row, column=0, sticky='we', padx=(20,5))
 
         # ---------- BUTTON FRAME DETAILS ----------
 
-        self.buttonFrameDetails = ctk.CTkFrame(self.detaisFrame, fg_color="#141414")
+        self.buttonFrameDetails = ctk.CTkFrame(self.detaisFrame, fg_color="#fff", border_color="#eee", border_width=2)
         self.buttonFrameDetails.grid(
             row=2,
             column=0,
             sticky='we',
-            padx=20,
+            padx=5,
             pady=(5, 10)
         )
 
@@ -265,21 +318,23 @@ class Properties:
         ctk.CTkLabel(
             self.buttonFrameDetails,
             text='Actions',
-            font=('Berlin Sans FB Demi', 32),
+            text_color="#1B2A63",
+            font=("Montserrat SemiBold", 32, "bold"),
             anchor='w'
         ).grid(row=0, column=0, sticky='we', padx=40, pady=(10, 5))
 
         # ---------- Buttons Frame ----------
         buttons_frame = ctk.CTkFrame(
             self.buttonFrameDetails,
-            fg_color="#141414"
+            fg_color="#fff"
         )
 
         buttons_frame.grid(
             row=1,
             column=0,
             sticky='we',
-
+            padx=5,
+            pady=(0, 5)
         )
 
         # configurar colunas
@@ -292,11 +347,11 @@ class Properties:
             text="📤 Export Report ",
             height=44,
             corner_radius=12,
-            fg_color="#141414",  # dark glass
-            hover_color="#1e293b",
+            fg_color="#1B2A63",  # dark glass
+            hover_color="#1B2A63",
             border_width=1,
-            border_color="#38c20e",  # cor neon JM
-            text_color="#38c20e",
+            border_color='#1B2A63',
+            text_color="#fff",
             font=("Berlin Sans FB Demi", 16),
             command=self.exportDadaToPDF
         )
@@ -311,14 +366,14 @@ class Properties:
 
         ctk.CTkButton(
             buttons_frame,
-            text="⚡Batch Analysis",
+            text="⚡ Batch Analysis",
             height=44,
             corner_radius=12,
-            fg_color="#141414",  # dark glass
-            hover_color="#1e293b",
+            fg_color="#C9AB6A",  # dark glass
+            hover_color="#C9AB6A",
             border_width=1,
-            border_color="#38c20e",  # cor neon JM
-            text_color="#38c20e",
+            border_color='#C9AB6A',
+            text_color="#fff",
             font=("Berlin Sans FB Demi", 16),
             command=lambda: self.bacth_analysis()
         ).grid(row=0, column=1, padx=5, pady=5, sticky="we")
@@ -329,11 +384,11 @@ class Properties:
             text="📂 Open Reports",
             height=44,
             corner_radius=12,
-            fg_color="#141414",  # dark glass
-            hover_color="#1e293b",
+            fg_color="#fff",  # dark glass
+            hover_color="#fff",
             border_width=1,
-            border_color="#38c20e",  # cor neon JM
-            text_color="#38c20e",
+            border_color='#1B2A63',
+            text_color="#1B2A63",
             font=("Berlin Sans FB Demi", 16),
             command=lambda: self.selecionar_e_abrir_pdf()
         ).grid(row=1, column=0, padx=5, pady=5, sticky="we")
@@ -343,11 +398,11 @@ class Properties:
             text="➕ More Actions",
             height=44,
             corner_radius=12,
-            fg_color="#141414",  # dark glass
-            hover_color="#1e293b",
+            fg_color="#fff",  # dark glass
+            hover_color="#fff",
             border_width=1,
-            border_color="#38c20e",  # cor neon JM
-            text_color="#38c20e",
+            border_color='#C9AB6A',
+            text_color="#C9AB6A",
             font=("Berlin Sans FB Demi", 16),
         ).grid(row=1, column=1, padx=5, pady=5, sticky="we")
 
@@ -388,10 +443,11 @@ class Properties:
         path = self.path_to_batch
         batch_array = ImageModel.batch_analysis(path)
         print(batch_array)
+
+        pdf = GenerateMultPDFReport(batch_array)
+        pdf.runBuild()
         messagebox.showinfo("Process", "Batch Gen. Concluded!")
 
-        # pdf = GenerateMultPDFReport(batch_array)
-        # pdf.runBuild()
 
     def updateImageProperties(self, path):
         self.imageModel = ImageModel.model_validate(ImageModel.from_image(path))
